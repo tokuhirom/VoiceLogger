@@ -251,22 +251,32 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             if let request = audioRecorder.startRecording() {
                 updateStatusItemForRecording(true)
                 
-                speechRecognizer.startTranscription(with: request) { [weak self] finalText, error in
-                    DispatchQueue.main.async {
-                        if let text = finalText, !text.isEmpty {
-                            self?.handleTranscribedText(text)
-                        } else if let error = error {
-                            let micName = self?.audioRecorder.getCurrentMicrophoneName() ?? "Unknown"
-                            self?.showAlert(title: "Transcription Error", 
-                                          message: "\(error.localizedDescription)\n\nCurrent microphone: \(micName)")
-                        } else {
-                            // No speech detected
-                            let micName = self?.audioRecorder.getCurrentMicrophoneName() ?? "Unknown"
-                            self?.showAlert(title: "No Speech Detected", 
-                                          message: "No speech was detected in the recording.\n\nCurrent microphone: \(micName)")
+                speechRecognizer.startTranscription(
+                    with: request,
+                    completion: { [weak self] finalText, error in
+                        DispatchQueue.main.async {
+                            if let text = finalText, !text.isEmpty {
+                                // Final text is handled when recording stops
+                                print("Final transcription received: \(text)")
+                            } else if let error = error {
+                                let micName = self?.audioRecorder.getCurrentMicrophoneName() ?? "Unknown"
+                                self?.showAlert(title: "Transcription Error", 
+                                              message: "\(error.localizedDescription)\n\nCurrent microphone: \(micName)")
+                            } else {
+                                // No speech detected
+                                let micName = self?.audioRecorder.getCurrentMicrophoneName() ?? "Unknown"
+                                self?.showAlert(title: "No Speech Detected", 
+                                              message: "No speech was detected in the recording.\n\nCurrent microphone: \(micName)")
+                            }
+                        }
+                    },
+                    onSegment: { [weak self] segmentText in
+                        DispatchQueue.main.async {
+                            print("Segment detected: \(segmentText)")
+                            self?.handleTranscribedText(segmentText)
                         }
                     }
-                }
+                )
             } else {
                 let micName = audioRecorder.getCurrentMicrophoneName()
                 showAlert(title: "Recording Error", 

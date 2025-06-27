@@ -8,6 +8,12 @@ class SpeechRecognizer: NSObject, ObservableObject {
     @Published var transcribedText = ""
     @Published var isAuthorized = false
     
+    // Silence detection
+    private var silenceTimer: Timer?
+    private let silenceThreshold: TimeInterval = 2.0 // 2 seconds of silence triggers segment
+    private var lastSegmentText = ""
+    private var segmentCallback: ((String) -> Void)?
+    
     override init() {
         super.init()
         requestAuthorization()
@@ -28,7 +34,9 @@ class SpeechRecognizer: NSObject, ObservableObject {
         }
     }
     
-    func startTranscription(with request: SFSpeechAudioBufferRecognitionRequest, completion: @escaping (String?, Error?) -> Void) {
+    func startTranscription(with request: SFSpeechAudioBufferRecognitionRequest, 
+                           completion: @escaping (String?, Error?) -> Void,
+                           onSegment: ((String) -> Void)? = nil) {
         guard isAuthorized else {
             completion(nil, NSError(domain: "SpeechRecognizer", code: 1, userInfo: [NSLocalizedDescriptionKey: "Speech recognition not authorized"]))
             return
@@ -43,7 +51,13 @@ class SpeechRecognizer: NSObject, ObservableObject {
         }
         
         transcribedText = ""
+        lastSegmentText = ""
         var lastTranscribedText = ""
+        segmentCallback = onSegment
+        
+        // Cancel any existing silence timer
+        silenceTimer?.invalidate()
+        silenceTimer = nil
         
         recognitionTask = speechRecognizer.recognitionTask(with: request) { [weak self] result, error in
             guard let self = self else { return }
@@ -54,6 +68,13 @@ class SpeechRecognizer: NSObject, ObservableObject {
                 // Keep track of the last non-empty transcription
                 if !text.isEmpty {
                     lastTranscribedText = text
+                    
+                    // Check if we have new content since last segment
+                    let newContent = self.extractNewContent(fullText: text, lastSegment: self.lastSegmentText)
+                    if !newContent.isEmpty {
+                        // Reset silence timer when we detect speech
+                        self.resetSilenceTimer()
+                    }
                 }
                 
                 DispatchQueue.main.async {
@@ -85,11 +106,60 @@ class SpeechRecognizer: NSObject, ObservableObject {
     }
     
     func stopTranscription() {
+        silenceTimer?.invalidate()
+        silenceTimer = nil
+        
+        // If we have any remaining text, send it as the final segment
+        if !transcribedText.isEmpty && transcribedText != lastSegmentText {
+            let finalSegment = extractNewContent(fullText: transcribedText, lastSegment: lastSegmentText)
+            if !finalSegment.isEmpty {
+                segmentCallback?(finalSegment)
+            }
+        }
+        
         recognitionTask?.finish()
         recognitionTask = nil
     }
     
+    private func resetSilenceTimer() {
+        silenceTimer?.invalidate()
+        
+        silenceTimer = Timer.scheduledTimer(withTimeInterval: silenceThreshold, repeats: false) { [weak self] _ in
+            self?.handleSilenceDetected()
+        }
+    }
+    
+    private func handleSilenceDetected() {
+        // Extract new content since last segment
+        let newContent = extractNewContent(fullText: transcribedText, lastSegment: lastSegmentText)
+        
+        if !newContent.isEmpty {
+            // Send the segment
+            segmentCallback?(newContent)
+            
+            // Update last segment to current full text
+            lastSegmentText = transcribedText
+        }
+    }
+    
+    private func extractNewContent(fullText: String, lastSegment: String) -> String {
+        // If lastSegment is empty, return the full text
+        if lastSegment.isEmpty {
+            return fullText
+        }
+        
+        // If full text starts with last segment, extract only the new part
+        if fullText.hasPrefix(lastSegment) {
+            let newPart = String(fullText.dropFirst(lastSegment.count))
+            return newPart.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        
+        // Otherwise, return the full text (might be a complete restart)
+        return fullText
+    }
+    
     deinit {
+        silenceTimer?.invalidate()
         stopTranscription()
     }
 }
