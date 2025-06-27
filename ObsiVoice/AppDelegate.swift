@@ -87,23 +87,31 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
     
     @objc private func startRecording() {
+        print("=== startRecording called ===")
         if audioRecorder.isRecording {
+            print("Already recording, stopping...")
             stopRecordingAndTranscribe()
         } else {
+            print("Starting new recording...")
             if let request = audioRecorder.startRecording() {
+                print("Recording started successfully")
                 updateStatusItemForRecording(true)
                 
                 speechRecognizer.startTranscription(with: request) { [weak self] finalText, error in
+                    print("Transcription callback received - text: \(finalText ?? "nil"), error: \(error?.localizedDescription ?? "nil")")
                     DispatchQueue.main.async {
                         if let text = finalText, !text.isEmpty {
+                            print("Got transcribed text: '\(text)'")
                             self?.handleTranscribedText(text)
                         } else if let error = error {
                             let micName = self?.audioRecorder.getCurrentMicrophoneName() ?? "Unknown"
+                            print("Transcription error: \(error)")
                             self?.showAlert(title: "Transcription Error", 
                                           message: "\(error.localizedDescription)\n\nCurrent microphone: \(micName)")
                         } else {
                             // No speech detected
                             let micName = self?.audioRecorder.getCurrentMicrophoneName() ?? "Unknown"
+                            print("No speech detected")
                             self?.showAlert(title: "No Speech Detected", 
                                           message: "No speech was detected in the recording.\n\nCurrent microphone: \(micName)")
                         }
@@ -111,6 +119,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 }
             } else {
                 let micName = audioRecorder.getCurrentMicrophoneName()
+                print("Failed to start recording")
                 showAlert(title: "Recording Error", 
                          message: "Failed to start recording. Please check microphone permissions.\n\nCurrent microphone: \(micName)")
             }
@@ -118,9 +127,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
     
     private func stopRecordingAndTranscribe() {
+        print("=== stopRecordingAndTranscribe called ===")
+        // Don't cancel the speech recognition task immediately
+        // Let the audio recorder handle the proper shutdown sequence
         audioRecorder.stopRecording()
-        speechRecognizer.stopTranscription()
         updateStatusItemForRecording(false)
+        
+        // Speech recognition will complete on its own when audio ends
     }
     
     private func updateStatusItemForRecording(_ isRecording: Bool) {
