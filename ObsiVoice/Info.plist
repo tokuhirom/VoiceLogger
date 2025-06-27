@@ -8,5 +8,7 @@
 	<string>ObsiVoice needs access to your microphone to record voice notes.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>ObsiVoice needs speech recognition to transcribe your voice notes.</string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>ObsiVoice needs accessibility access to register global keyboard shortcuts.</string>
 </dict>
 </plist>

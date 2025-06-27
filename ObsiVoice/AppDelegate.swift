@@ -7,9 +7,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var popover: NSPopover!
     private let audioRecorder = AudioRecorder()
     private let speechRecognizer = SpeechRecognizer()
+    private var settingsWindow: NSWindow?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupMenuBar()
+        setupShortcuts()
+    }
+    
+    func applicationWillTerminate(_ notification: Notification) {
+        ShortcutManager.shared.unregister()
     }
     
     private func setupMenuBar() {
@@ -23,11 +29,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         setupMenu()
     }
     
+    private func setupShortcuts() {
+        ShortcutManager.shared.register { [weak self] in
+            self?.startRecording()
+        }
+    }
+    
     private func setupMenu() {
         let menu = NSMenu()
         menu.delegate = self
         
-        menu.addItem(NSMenuItem(title: "Record Voice Note", action: #selector(startRecording), keyEquivalent: "r"))
+        let recordItem = NSMenuItem(title: "Record Voice Note", action: #selector(startRecording), keyEquivalent: "")
+        if let shortcut = ShortcutManager.shared.currentShortcut {
+            recordItem.keyEquivalent = ""
+            recordItem.title = "Record Voice Note (\(shortcut.displayString))"
+        }
+        menu.addItem(recordItem)
         menu.addItem(NSMenuItem.separator())
         
         // Microphone selection submenu
@@ -172,8 +189,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
     
     @objc private func openSettings() {
-        print("Opening settings...")
-        // TODO: Implement settings window
+        if settingsWindow == nil {
+            let settingsView = SettingsView()
+            
+            settingsWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 500, height: 400),
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            
+            settingsWindow?.title = "ObsiVoice Settings"
+            settingsWindow?.contentView = NSHostingView(rootView: settingsView)
+            settingsWindow?.center()
+            settingsWindow?.isReleasedWhenClosed = false
+        }
+        
+        settingsWindow?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
     
     @objc private func setVaultName() {
