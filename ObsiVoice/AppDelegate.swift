@@ -10,8 +10,49 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var settingsWindow: NSWindow?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Ensure app appears in accessibility list immediately
+        ensureInAccessibilityList()
+        
         setupMenuBar()
         setupShortcuts()
+    }
+    
+    private func ensureInAccessibilityList() {
+        // Use multiple methods to ensure we appear in the accessibility list
+        
+        // Method 1: Try to create and immediately release a CGEvent tap
+        if let eventTap = CGEvent.tapCreate(
+            tap: .cgSessionEventTap,
+            place: .headInsertEventTap,
+            options: .defaultTap,
+            eventsOfInterest: CGEventMask(1 << CGEventType.keyDown.rawValue),
+            callback: { _, _, _, _ in return nil },
+            userInfo: nil
+        ) {
+            CFMachPortInvalidate(eventTap)
+        }
+        
+        // Method 2: Create a temporary global event monitor
+        if let monitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown, handler: { _ in }) {
+            NSEvent.removeMonitor(monitor)
+        }
+        
+        // Method 3: Check trusted status with prompt
+        let options = NSDictionary(object: kCFBooleanFalse!, forKey: kAXTrustedCheckOptionPrompt.takeUnretainedValue() as NSString)
+        _ = AXIsProcessTrustedWithOptions(options)
+    }
+    
+    func applicationDidBecomeActive(_ notification: Notification) {
+        // Re-check accessibility permissions when app becomes active
+        if AXIsProcessTrusted() {
+            ShortcutManager.shared.unregister()
+            ShortcutManager.shared.register { [weak self] in
+                print("Shortcut action triggered in AppDelegate")
+                DispatchQueue.main.async {
+                    self?.startRecording()
+                }
+            }
+        }
     }
     
     func applicationWillTerminate(_ notification: Notification) {
@@ -30,8 +71,50 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
     
     private func setupShortcuts() {
+        print("Setting up shortcuts...")
+        
+        // Request accessibility permissions on first launch to ensure we appear in the list
+        ensureAccessibilityPermissions()
+        
         ShortcutManager.shared.register { [weak self] in
-            self?.startRecording()
+            print("Shortcut action triggered in AppDelegate")
+            DispatchQueue.main.async {
+                self?.startRecording()
+            }
+        }
+    }
+    
+    private func ensureAccessibilityPermissions() {
+        // Check if this is the first launch
+        let hasRequestedPermissionKey = "HasRequestedAccessibilityPermission"
+        let hasRequested = UserDefaults.standard.bool(forKey: hasRequestedPermissionKey)
+        
+        if !hasRequested {
+            // First, ensure we're in the list
+            ensureInAccessibilityList()
+            
+            // Then check if we're trusted
+            let trusted = AXIsProcessTrusted()
+            
+            if !trusted {
+                DispatchQueue.main.async {
+                    let alert = NSAlert()
+                    alert.messageText = "Enable Keyboard Shortcuts"
+                    alert.informativeText = "ObsiVoice uses global keyboard shortcuts to start recording from any app.\n\nPlease:\n1. Click 'Open System Preferences'\n2. Find ObsiVoice in the list\n3. Check the box next to ObsiVoice\n4. Restart ObsiVoice"
+                    alert.alertStyle = .informational
+                    alert.addButton(withTitle: "Open System Preferences")
+                    alert.addButton(withTitle: "Skip")
+                    
+                    if alert.runModal() == .alertFirstButtonReturn {
+                        // Open System Preferences
+                        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                            NSWorkspace.shared.open(url)
+                        }
+                    }
+                }
+            }
+            
+            UserDefaults.standard.set(true, forKey: hasRequestedPermissionKey)
         }
     }
     
@@ -42,7 +125,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let recordItem = NSMenuItem(title: "Record Voice Note", action: #selector(startRecording), keyEquivalent: "")
         if let shortcut = ShortcutManager.shared.currentShortcut {
             recordItem.keyEquivalent = ""
-            recordItem.title = "Record Voice Note (\(shortcut.displayString))"
+            if AXIsProcessTrusted() {
+                recordItem.title = "Record Voice Note (\(shortcut.displayString))"
+            } else {
+                recordItem.title = "Record Voice Note (\(shortcut.displayString) - ⚠️ No Permission)"
+            }
         }
         menu.addItem(recordItem)
         menu.addItem(NSMenuItem.separator())
@@ -119,7 +206,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // This will be used later for popover functionality
     }
     
-    @objc private func startRecording() {
+    @objc func startRecording() {
         if audioRecorder.isRecording {
             stopRecordingAndTranscribe()
         } else {

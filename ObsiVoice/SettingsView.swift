@@ -26,6 +26,19 @@ struct SettingsView: View {
                             .frame(width: 200, height: 30)
                             .onChange(of: recordingShortcut) { newShortcut in
                                 if let shortcut = newShortcut {
+                                    // Check accessibility permissions when setting shortcut
+                                    if !AXIsProcessTrusted() {
+                                        let alert = NSAlert()
+                                        alert.messageText = "Accessibility Permission Required"
+                                        alert.informativeText = "Global keyboard shortcuts require accessibility permissions.\n\nWould you like to grant permission now?"
+                                        alert.alertStyle = .informational
+                                        alert.addButton(withTitle: "Grant Permission")
+                                        alert.addButton(withTitle: "Continue Anyway")
+                                        
+                                        if alert.runModal() == .alertFirstButtonReturn {
+                                            openAccessibilityPreferences()
+                                        }
+                                    }
                                     ShortcutManager.shared.saveShortcut(shortcut)
                                 }
                             }
@@ -37,6 +50,25 @@ struct SettingsView: View {
                             }
                         }
                     }
+                    
+                    // Accessibility permission status
+                    VStack(alignment: .leading, spacing: 5) {
+                        HStack {
+                            Image(systemName: AXIsProcessTrusted() ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                .foregroundColor(AXIsProcessTrusted() ? .green : .red)
+                            Text(AXIsProcessTrusted() ? "Accessibility permissions granted" : "Accessibility permissions required for global shortcuts")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        if !AXIsProcessTrusted() {
+                            Button("Open System Preferences") {
+                                openAccessibilityPreferences()
+                            }
+                            .font(.caption)
+                        }
+                    }
+                    .padding(.top, 5)
                 }
                 .padding()
             }
@@ -122,6 +154,16 @@ struct SettingsView: View {
     
     private func closeWindow() {
         NSApplication.shared.keyWindow?.close()
+    }
+    
+    private func openAccessibilityPreferences() {
+        // Try multiple methods to open accessibility preferences
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+            NSWorkspace.shared.open(url)
+        } else {
+            // Fallback: Open System Preferences app
+            NSWorkspace.shared.launchApplication("System Preferences")
+        }
     }
 }
 
