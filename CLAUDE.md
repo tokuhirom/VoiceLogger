@@ -95,3 +95,7 @@ Currently no external dependencies. The app uses only native macOS frameworks:
 - AVFoundation (to be added)
 - Speech (to be added)
 - AppKit for menu bar functionality (to be added)
+
+## Version Control Guidelines
+
+- Commit message must be in english.
