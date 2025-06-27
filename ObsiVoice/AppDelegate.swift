@@ -38,6 +38,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(microphoneItem)
         
         menu.addItem(NSMenuItem.separator())
+        
+        // Obsidian settings submenu
+        let obsidianItem = NSMenuItem(title: "Obsidian Settings", action: nil, keyEquivalent: "")
+        let obsidianSubmenu = NSMenu()
+        
+        let vaultItem = NSMenuItem(title: "Vault: \(ObsidianManager.shared.vaultName.isEmpty ? "Not configured" : ObsidianManager.shared.vaultName)", action: nil, keyEquivalent: "")
+        vaultItem.isEnabled = false
+        obsidianSubmenu.addItem(vaultItem)
+        
+        obsidianSubmenu.addItem(NSMenuItem(title: "Set Vault Name...", action: #selector(setVaultName), keyEquivalent: ""))
+        obsidianSubmenu.addItem(NSMenuItem(title: "Test Connection", action: #selector(testObsidianConnection), keyEquivalent: ""))
+        
+        obsidianItem.submenu = obsidianSubmenu
+        menu.addItem(obsidianItem)
+        
+        menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ","))
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Quit ObsiVoice", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
@@ -134,7 +150,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
     
     private func handleTranscribedText(_ text: String) {
-        // TODO: Send to Obsidian via Advanced URI
+        // Send to Obsidian via Advanced URI
+        ObsidianManager.shared.appendToDaily(text: text)
         showNotification(title: "Voice Note Transcribed", subtitle: text)
     }
     
@@ -157,6 +174,36 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc private func openSettings() {
         print("Opening settings...")
         // TODO: Implement settings window
+    }
+    
+    @objc private func setVaultName() {
+        let alert = NSAlert()
+        alert.messageText = "Set Obsidian Vault Name"
+        alert.informativeText = "Enter the name of your Obsidian vault:"
+        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: "Cancel")
+        
+        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        textField.stringValue = ObsidianManager.shared.vaultName
+        alert.accessoryView = textField
+        
+        if alert.runModal() == .alertFirstButtonReturn {
+            ObsidianManager.shared.vaultName = textField.stringValue
+            // Refresh menu to show new vault name
+            setupMenu()
+        }
+    }
+    
+    @objc private func testObsidianConnection() {
+        ObsidianManager.shared.testConnection { [weak self] success, error in
+            DispatchQueue.main.async {
+                if success {
+                    self?.showAlert(title: "Success", message: "Successfully connected to Obsidian vault!")
+                } else {
+                    self?.showAlert(title: "Connection Failed", message: error ?? "Unknown error")
+                }
+            }
+        }
     }
     
     // MARK: - NSMenuDelegate
