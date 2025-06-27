@@ -45,13 +45,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func applicationDidBecomeActive(_ notification: Notification) {
         // Re-check accessibility permissions when app becomes active
         if AXIsProcessTrusted() {
-            ShortcutManager.shared.unregister()
-            ShortcutManager.shared.register { [weak self] in
-                print("Shortcut action triggered in AppDelegate")
-                DispatchQueue.main.async {
-                    self?.startRecording()
-                }
-            }
+            registerShortcuts()
         }
     }
     
@@ -76,11 +70,40 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // Request accessibility permissions on first launch to ensure we appear in the list
         ensureAccessibilityPermissions()
         
-        ShortcutManager.shared.register { [weak self] in
-            print("Shortcut action triggered in AppDelegate")
-            DispatchQueue.main.async {
-                self?.startRecording()
+        registerShortcuts()
+    }
+    
+    private func registerShortcuts() {
+        ShortcutManager.shared.unregister()
+        ShortcutManager.shared.register(
+            keyDown: { [weak self] in
+                print("Key down action in AppDelegate - starting hold-to-record")
+                DispatchQueue.main.async {
+                    self?.startRecording()
+                }
+            },
+            keyUp: { [weak self] in
+                print("Key up action in AppDelegate - stopping hold-to-record")
+                DispatchQueue.main.async {
+                    self?.stopRecordingAndTranscribe()
+                }
+            },
+            toggle: { [weak self] in
+                print("Toggle action in AppDelegate")
+                DispatchQueue.main.async {
+                    self?.toggleRecording()
+                }
             }
+        )
+    }
+    
+    private func toggleRecording() {
+        if audioRecorder.isRecording {
+            print("Toggle: stopping recording")
+            stopRecordingAndTranscribe()
+        } else {
+            print("Toggle: starting recording")
+            startRecording()
         }
     }
     

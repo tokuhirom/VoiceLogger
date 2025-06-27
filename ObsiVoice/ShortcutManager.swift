@@ -80,10 +80,21 @@ class ShortcutManager {
     
     private var globalEventMonitor: Any?
     private var localEventMonitor: Any?
+    private var globalKeyUpMonitor: Any?
+    private var localKeyUpMonitor: Any?
     private var registeredShortcut: KeyboardShortcut?
-    private var action: (() -> Void)?
+    private var keyDownAction: (() -> Void)?
+    private var keyUpAction: (() -> Void)?
+    private var toggleAction: (() -> Void)?
     
     private let shortcutKey = "RecordingShortcut"
+    
+    // State tracking
+    private var isKeyPressed = false
+    private var keyPressTime: Date?
+    private let longPressThreshold: TimeInterval = 0.3 // 300ms to distinguish between tap and hold
+    private var longPressTimer: Timer?
+    private var isRecordingFromHold = false
     
     private init() {
         loadShortcut()
@@ -100,7 +111,7 @@ class ShortcutManager {
                 registeredShortcut = shortcut
                 
                 // Re-register with new shortcut
-                if action != nil {
+                if keyDownAction != nil || keyUpAction != nil {
                     stopMonitoring()
                     startMonitoring()
                 }
@@ -126,15 +137,21 @@ class ShortcutManager {
         }
     }
     
-    func register(action: @escaping () -> Void) {
-        self.action = action
+    func register(keyDown: @escaping () -> Void, keyUp: @escaping () -> Void, toggle: @escaping () -> Void) {
+        self.keyDownAction = keyDown
+        self.keyUpAction = keyUp
+        self.toggleAction = toggle
         loadShortcut() // Ensure shortcut is loaded
         startMonitoring()
     }
     
     func unregister() {
         stopMonitoring()
-        self.action = nil
+        self.keyDownAction = nil
+        self.keyUpAction = nil
+        self.toggleAction = nil
+        longPressTimer?.invalidate()
+        longPressTimer = nil
     }
     
     private func startMonitoring() {
@@ -145,31 +162,82 @@ class ShortcutManager {
         
         print("Starting monitoring for shortcut: \(shortcut.displayString)")
         
-        // Define the event handler
-        let eventHandler: (NSEvent) -> NSEvent? = { [weak self] event in
+        // Define the keyDown event handler
+        let keyDownHandler: (NSEvent) -> NSEvent? = { [weak self] event in
+            guard let self = self else { return event }
+            
             let eventModifiers = event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue
             
-            // Debug: Log key events
-            if eventModifiers != 0 {  // Only log events with modifiers
-                print("Key event: keyCode=\(event.keyCode), modifiers=\(eventModifiers), expected: keyCode=\(shortcut.keyCode), modifiers=\(shortcut.modifierFlags)")
-            }
-            
             if event.keyCode == shortcut.keyCode && eventModifiers == shortcut.modifierFlags {
-                print("✓ Shortcut triggered! (from \(NSApp.isActive ? "local" : "global") monitor)")
-                DispatchQueue.main.async {
-                    self?.action?()
+                // Prevent key repeat
+                if !self.isKeyPressed {
+                    self.isKeyPressed = true
+                    self.keyPressTime = Date()
+                    self.isRecordingFromHold = false
+                    
+                    print("Key down detected")
+                    
+                    // Start a timer to detect long press
+                    self.longPressTimer?.invalidate()
+                    self.longPressTimer = Timer.scheduledTimer(withTimeInterval: self.longPressThreshold, repeats: false) { _ in
+                        DispatchQueue.main.async {
+                            print("Long press detected - starting hold-to-record")
+                            self.isRecordingFromHold = true
+                            self.keyDownAction?()
+                        }
+                    }
                 }
                 return nil // Consume the event
             }
             return event
         }
         
-        // Local monitor for when app has focus
-        localEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            return eventHandler(event)
+        // Define the keyUp event handler
+        let keyUpHandler: (NSEvent) -> NSEvent? = { [weak self] event in
+            guard let self = self else { return event }
+            
+            let eventModifiers = event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue
+            
+            if event.keyCode == shortcut.keyCode && eventModifiers == shortcut.modifierFlags {
+                if self.isKeyPressed {
+                    self.isKeyPressed = false
+                    let pressDuration = Date().timeIntervalSince(self.keyPressTime ?? Date())
+                    
+                    print("Key up detected, duration: \(pressDuration)s")
+                    
+                    // Cancel the long press timer
+                    self.longPressTimer?.invalidate()
+                    self.longPressTimer = nil
+                    
+                    if self.isRecordingFromHold {
+                        // Was holding - stop recording
+                        print("Stopping hold-to-record")
+                        DispatchQueue.main.async {
+                            self.keyUpAction?()
+                        }
+                    } else if pressDuration < self.longPressThreshold {
+                        // Short tap - toggle recording
+                        print("Short tap detected - toggling recording")
+                        DispatchQueue.main.async {
+                            self.toggleAction?()
+                        }
+                    }
+                }
+                return nil // Consume the event
+            }
+            return event
         }
         
-        // Global monitor for when other apps have focus
+        // Local monitors for when app has focus
+        localEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            return keyDownHandler(event)
+        }
+        
+        localKeyUpMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyUp) { event in
+            return keyUpHandler(event)
+        }
+        
+        // Global monitors for when other apps have focus
         // Check accessibility permissions without prompting first
         let trusted = AXIsProcessTrusted()
         
@@ -205,16 +273,20 @@ class ShortcutManager {
             _ = AXIsProcessTrustedWithOptions(options)
         }
         
-        // Install global monitor if we have accessibility permissions
+        // Install global monitors if we have accessibility permissions
         if trusted {
             globalEventMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
-                _ = eventHandler(event)
+                _ = keyDownHandler(event)
             }
             
-            if globalEventMonitor != nil {
-                print("✓ Global event monitor installed successfully")
+            globalKeyUpMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyUp) { event in
+                _ = keyUpHandler(event)
+            }
+            
+            if globalEventMonitor != nil && globalKeyUpMonitor != nil {
+                print("✓ Global event monitors installed successfully")
             } else {
-                print("✗ Failed to install global event monitor (unexpected)")
+                print("✗ Failed to install global event monitors (unexpected)")
             }
         } else {
             print("✗ Cannot install global event monitor without accessibility permissions")
@@ -229,8 +301,8 @@ class ShortcutManager {
             }
         }
         
-        if localEventMonitor != nil {
-            print("Local event monitor installed successfully")
+        if localEventMonitor != nil && localKeyUpMonitor != nil {
+            print("Local event monitors installed successfully")
         }
     }
     
@@ -244,5 +316,20 @@ class ShortcutManager {
             NSEvent.removeMonitor(monitor)
             localEventMonitor = nil
         }
+        
+        if let monitor = globalKeyUpMonitor {
+            NSEvent.removeMonitor(monitor)
+            globalKeyUpMonitor = nil
+        }
+        
+        if let monitor = localKeyUpMonitor {
+            NSEvent.removeMonitor(monitor)
+            localKeyUpMonitor = nil
+        }
+        
+        longPressTimer?.invalidate()
+        longPressTimer = nil
+        isKeyPressed = false
+        isRecordingFromHold = false
     }
 }
