@@ -17,34 +17,61 @@ class AudioRecorder: NSObject, ObservableObject {
     func startRecording() -> SFSpeechAudioBufferRecognitionRequest? {
         guard !isRecording else { return nil }
         
+        // Check microphone permission first
+        switch AVCaptureDevice.authorizationStatus(for: .audio) {
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .audio) { granted in
+                if granted {
+                    DispatchQueue.main.async {
+                        _ = self.startRecording()
+                    }
+                }
+            }
+            return nil
+        case .denied, .restricted:
+            print("Microphone access denied")
+            return nil
+        case .authorized:
+            break
+        @unknown default:
+            return nil
+        }
+        
         audioEngine = AVAudioEngine()
         guard let audioEngine = audioEngine else { return nil }
         
         inputNode = audioEngine.inputNode
+        
+        // Use the input node's format to avoid format mismatch
         let recordingFormat = inputNode!.outputFormat(forBus: 0)
         
         recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
         recognitionRequest?.shouldReportPartialResults = true
         
-        inputNode!.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] (buffer, _) in
-            self?.recognitionRequest?.append(buffer)
-            
-            // Calculate audio level for visual feedback
-            let channelData = buffer.floatChannelData?[0]
-            let channelDataValueCount = Int(buffer.frameLength)
-            if let channelData = channelData {
-                var sum: Float = 0
-                for i in 0..<channelDataValueCount {
-                    sum += channelData[i] * channelData[i]
-                }
-                let rms = sqrt(sum / Float(channelDataValueCount))
-                let avgPower = 20 * log10(rms)
-                let level = max(0.0, min(1.0, (avgPower + 50) / 50))
+        do {
+            inputNode!.installTap(onBus: 0, bufferSize: 4096, format: recordingFormat) { [weak self] (buffer, _) in
+                self?.recognitionRequest?.append(buffer)
                 
-                DispatchQueue.main.async {
-                    self?.audioLevel = level
+                // Calculate audio level for visual feedback
+                let channelData = buffer.floatChannelData?[0]
+                let channelDataValueCount = Int(buffer.frameLength)
+                if let channelData = channelData {
+                    var sum: Float = 0
+                    for i in 0..<channelDataValueCount {
+                        sum += channelData[i] * channelData[i]
+                    }
+                    let rms = sqrt(sum / Float(channelDataValueCount))
+                    let avgPower = 20 * log10(max(0.00001, rms))
+                    let level = max(0.0, min(1.0, (avgPower + 50) / 50))
+                    
+                    DispatchQueue.main.async {
+                        self?.audioLevel = level
+                    }
                 }
             }
+        } catch {
+            print("Failed to install tap: \(error)")
+            return nil
         }
         
         audioEngine.prepare()
@@ -55,6 +82,7 @@ class AudioRecorder: NSObject, ObservableObject {
             return recognitionRequest
         } catch {
             print("Failed to start audio engine: \(error)")
+            stopRecording()
             return nil
         }
     }

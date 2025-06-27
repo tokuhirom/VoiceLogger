@@ -99,3 +99,7 @@ Currently no external dependencies. The app uses only native macOS frameworks:
 ## Version Control Guidelines
 
 - Commit message must be in english.
+
+## Platform Specific Notes
+
+- This app runs on MacOS. Not run on iOS. AVAudioSession is not available on Mac.
