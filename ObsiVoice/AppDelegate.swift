@@ -8,6 +8,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let audioRecorder = AudioRecorder()
     private let speechRecognizer = SpeechRecognizer()
     private var settingsWindow: NSWindow?
+    private var stopRecordingTimer: Timer?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Ensure app appears in accessibility list immediately
@@ -83,9 +84,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 }
             },
             keyUp: { [weak self] in
-                print("Key up action in AppDelegate - stopping hold-to-record")
+                print("Key up action in AppDelegate - stopping hold-to-record after delay")
                 DispatchQueue.main.async {
-                    self?.stopRecordingAndTranscribe()
+                    self?.scheduleStopRecording()
                 }
             },
             toggle: { [weak self] in
@@ -104,6 +105,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         } else {
             print("Toggle: starting recording")
             startRecording()
+        }
+    }
+    
+    private func scheduleStopRecording() {
+        // Cancel any existing timer
+        stopRecordingTimer?.invalidate()
+        
+        // Update icon to show we're in the delay period
+        updateStatusItemForProcessing()
+        
+        // Schedule stop after 1 second
+        stopRecordingTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { [weak self] _ in
+            self?.stopRecordingAndTranscribe()
+            self?.stopRecordingTimer = nil
         }
     }
     
@@ -261,6 +276,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
     
     private func stopRecordingAndTranscribe() {
+        // Cancel any pending stop timer
+        stopRecordingTimer?.invalidate()
+        stopRecordingTimer = nil
+        
         // Don't cancel the speech recognition task immediately
         // Let the audio recorder handle the proper shutdown sequence
         audioRecorder.stopRecording()
@@ -273,6 +292,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if let button = statusItem.button {
             let imageName = isRecording ? "mic.circle.fill" : "mic.fill"
             button.image = NSImage(systemSymbolName: imageName, accessibilityDescription: "ObsiVoice")
+        }
+    }
+    
+    private func updateStatusItemForProcessing() {
+        if let button = statusItem.button {
+            // Use a different icon to show we're processing/waiting
+            button.image = NSImage(systemSymbolName: "hourglass", accessibilityDescription: "ObsiVoice Processing")
         }
     }
     
