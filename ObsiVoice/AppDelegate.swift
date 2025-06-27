@@ -1,9 +1,12 @@
 import Cocoa
 import SwiftUI
+import Speech
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
+    private let audioRecorder = AudioRecorder()
+    private let speechRecognizer = SpeechRecognizer()
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupMenuBar()
@@ -37,8 +40,60 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     @objc private func startRecording() {
-        print("Starting voice recording...")
-        // TODO: Implement voice recording
+        if audioRecorder.isRecording {
+            stopRecordingAndTranscribe()
+        } else {
+            if let request = audioRecorder.startRecording() {
+                updateStatusItemForRecording(true)
+                
+                speechRecognizer.startTranscription(with: request) { [weak self] finalText, error in
+                    DispatchQueue.main.async {
+                        if let text = finalText {
+                            self?.handleTranscribedText(text)
+                        } else if let error = error {
+                            self?.showAlert(title: "Transcription Error", message: error.localizedDescription)
+                        }
+                    }
+                }
+            } else {
+                showAlert(title: "Recording Error", message: "Failed to start recording. Please check microphone permissions.")
+            }
+        }
+    }
+    
+    private func stopRecordingAndTranscribe() {
+        audioRecorder.stopRecording()
+        speechRecognizer.stopTranscription()
+        updateStatusItemForRecording(false)
+    }
+    
+    private func updateStatusItemForRecording(_ isRecording: Bool) {
+        if let button = statusItem.button {
+            let imageName = isRecording ? "mic.circle.fill" : "mic.fill"
+            button.image = NSImage(systemSymbolName: imageName, accessibilityDescription: "ObsiVoice")
+        }
+    }
+    
+    private func handleTranscribedText(_ text: String) {
+        print("Transcribed text: \(text)")
+        // TODO: Send to Obsidian via Advanced URI
+        showNotification(title: "Voice Note Transcribed", subtitle: text)
+    }
+    
+    private func showAlert(title: String, message: String) {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = message
+        alert.alertStyle = .warning
+        alert.runModal()
+    }
+    
+    private func showNotification(title: String, subtitle: String) {
+        let notification = NSUserNotification()
+        notification.title = title
+        notification.subtitle = subtitle
+        notification.soundName = NSUserNotificationDefaultSoundName
+        NSUserNotificationCenter.default.deliver(notification)
     }
     
     @objc private func openSettings() {
