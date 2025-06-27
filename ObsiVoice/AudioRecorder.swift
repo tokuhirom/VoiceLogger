@@ -28,42 +28,12 @@ class AudioRecorder: NSObject, ObservableObject {
     }
     
     private func setupNotifications() {
-        // Listen for device changes
-        var propertyAddress = AudioObjectPropertyAddress(
-            mSelector: kAudioHardwarePropertyDevices,
-            mScope: kAudioObjectPropertyScopeGlobal,
-            mElement: kAudioObjectPropertyElementMain
-        )
-        
-        AudioObjectAddPropertyListener(
-            AudioObjectID(kAudioObjectSystemObject),
-            &propertyAddress,
-            { (objectID, numberAddresses, addresses, clientData) -> OSStatus in
-                guard let clientData = clientData else { return noErr }
-                let recorder = Unmanaged<AudioRecorder>.fromOpaque(clientData).takeUnretainedValue()
-                recorder.updateAvailableDevices()
-                return noErr
-            },
-            Unmanaged.passUnretained(self).toOpaque()
-        )
+        // Disable automatic device change monitoring for now
+        // This was causing excessive updates and speech recognition errors
     }
     
     deinit {
         stopRecording()
-        
-        // Remove property listener
-        var propertyAddress = AudioObjectPropertyAddress(
-            mSelector: kAudioHardwarePropertyDevices,
-            mScope: kAudioObjectPropertyScopeGlobal,
-            mElement: kAudioObjectPropertyElementMain
-        )
-        
-        AudioObjectRemovePropertyListener(
-            AudioObjectID(kAudioObjectSystemObject),
-            &propertyAddress,
-            { (objectID, numberAddresses, addresses, clientData) -> OSStatus in noErr },
-            Unmanaged.passUnretained(self).toOpaque()
-        )
     }
     
     func updateAvailableDevices() {
@@ -164,12 +134,10 @@ class AudioRecorder: NSObject, ObservableObject {
                     let deviceName = cfName as String
                     let deviceUID = cfUID as String
                     devices.append(AudioDevice(id: deviceID, name: deviceName, uid: deviceUID))
-                    print("Found input device: \(deviceName) (UID: \(deviceUID), Channels: \(totalChannels))")
                 }
             }
         }
         
-        print("Total input devices found: \(devices.count)")
         
         DispatchQueue.main.async {
             self.availableDevices = devices
@@ -243,20 +211,11 @@ class AudioRecorder: NSObject, ObservableObject {
         
         recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
         recognitionRequest?.shouldReportPartialResults = true
+        recognitionRequest?.requiresOnDeviceRecognition = true
         
-        // Debug: Log format info
-        print("Recording format: \(recordingFormat)")
-        print("Sample rate: \(recordingFormat.sampleRate)")
-        print("Channels: \(recordingFormat.channelCount)")
-        
-        var bufferCount = 0
-        inputNode!.installTap(onBus: 0, bufferSize: 4096, format: recordingFormat) { [weak self] (buffer, when) in
-            bufferCount += 1
-            if bufferCount % 50 == 0 { // Log every 50 buffers
-                print("Buffer #\(bufferCount) received, frame length: \(buffer.frameLength)")
-            }
-            
-            self?.recognitionRequest?.append(buffer)
+        inputNode!.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] (buffer, when) in
+            guard let self = self, let request = self.recognitionRequest else { return }
+            request.append(buffer)
             
             // Calculate audio level for visual feedback
             let channelData = buffer.floatChannelData?[0]
@@ -273,12 +232,9 @@ class AudioRecorder: NSObject, ObservableObject {
                 let avgPower = 20 * log10(max(0.00001, rms))
                 let level = max(0.0, min(1.0, (avgPower + 50) / 50))
                 
-                if bufferCount % 50 == 0 {
-                    print("Audio level - RMS: \(rms), Max: \(maxValue), Level: \(level)")
-                }
                 
                 DispatchQueue.main.async {
-                    self?.audioLevel = level
+                    self.audioLevel = level
                 }
             }
         }
@@ -288,8 +244,6 @@ class AudioRecorder: NSObject, ObservableObject {
         do {
             try audioEngine.start()
             isRecording = true
-            print("Audio engine started successfully")
-            print("Recognition request created: \(recognitionRequest != nil)")
             return recognitionRequest
         } catch {
             print("Failed to start audio engine: \(error)")
@@ -301,24 +255,19 @@ class AudioRecorder: NSObject, ObservableObject {
     func stopRecording() {
         guard isRecording else { return }
         
-        print("Stopping recording...")
+        // Stop the audio engine immediately
+        audioEngine?.stop()
+        inputNode?.removeTap(onBus: 0)
         
-        // First, end the audio input to the recognition request
+        // End the audio input to the recognition request
         recognitionRequest?.endAudio()
         
-        // Give a small delay to let the recognition finish
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.audioEngine?.stop()
-            self?.inputNode?.removeTap(onBus: 0)
-            
-            self?.audioEngine = nil
-            self?.recognitionRequest = nil
-            self?.inputNode = nil
-            
-            self?.isRecording = false
-            self?.audioLevel = 0.0
-            
-            print("Recording stopped")
-        }
+        // Clean up
+        audioEngine = nil
+        recognitionRequest = nil
+        inputNode = nil
+        
+        isRecording = false
+        audioLevel = 0.0
     }
 }
