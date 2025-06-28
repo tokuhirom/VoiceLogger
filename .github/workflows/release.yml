@@ -51,38 +51,24 @@ jobs:
           VoiceLogger.dmg
     
     - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: VoiceLogger ${{ steps.get_version.outputs.VERSION }}
-        body: |
-          VoiceLogger release ${{ steps.get_version.outputs.VERSION }}
-          
-          ## Changes
-          - See commit history for changes
-          
-          ## Installation
-          1. Download VoiceLogger.dmg
-          2. Open the DMG file
-          3. Drag VoiceLogger to Applications folder
-          4. Launch VoiceLogger from Applications
-          
-          ## Permissions Required
-          - Microphone access
-          - Speech recognition
-          - Accessibility (for global shortcuts)
-        draft: false
-        prerelease: false
-    
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./VoiceLogger.dmg
-        asset_name: VoiceLogger.dmg
-        asset_content_type: application/x-apple-diskimage
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh release create "${{ github.ref_name }}" \
+          --title "VoiceLogger ${{ steps.get_version.outputs.VERSION }}" \
+          --notes "VoiceLogger release ${{ steps.get_version.outputs.VERSION }}
+        
+        ## Changes
+        - See commit history for changes
+        
+        ## Installation
+        1. Download VoiceLogger.dmg
+        2. Open the DMG file
+        3. Drag VoiceLogger to Applications folder
+        4. Launch VoiceLogger from Applications
+        
+        ## Permissions Required
+        - Microphone access
+        - Speech recognition
+        - Accessibility (for global shortcuts)" \
+          VoiceLogger.dmg
