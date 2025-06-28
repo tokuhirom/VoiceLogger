@@ -65,7 +65,7 @@ class LaunchAtLoginHelper {
     }
     
     private func legacySetEnabled(_ enabled: Bool) {
-        guard let bundlePath = Bundle.main.bundlePath else { return }
+        let bundlePath = Bundle.main.bundlePath
         let appName = (bundlePath as NSString).lastPathComponent.replacingOccurrences(of: ".app", with: "")
         
         if enabled {
