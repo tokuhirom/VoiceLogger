@@ -11,13 +11,15 @@ struct SettingsView: View {
     @State private var dateHeaderPreview: String = ""
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 0) {
             // Title
             Text("ObsiVoice Settings")
                 .font(.largeTitle)
-                .padding(.top)
+                .padding()
             
-            // Shortcut Settings
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Shortcut Settings
             GroupBox(label: Label("Recording Shortcut", systemImage: "keyboard")) {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Set a global keyboard shortcut to start/stop recording")
@@ -160,8 +162,11 @@ struct SettingsView: View {
                 }
                 .padding()
             }
+                }
+                .padding(.horizontal)
+            }
             
-            Spacer()
+            Divider()
             
             // Save and Cancel buttons
             HStack {
@@ -180,7 +185,7 @@ struct SettingsView: View {
             }
             .padding()
         }
-        .frame(width: 500, height: 500)
+        .frame(width: 500, height: 600)
         .padding()
     }
     
