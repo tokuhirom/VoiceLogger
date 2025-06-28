@@ -3,8 +3,11 @@ import SwiftUI
 struct SettingsView: View {
     @State private var filePathTemplate = FileManager.shared.filePathTemplate
     @State private var noteTemplate = FileManager.shared.noteTemplate
+    @State private var dateHeaderFormat = FileManager.shared.dateHeaderFormat
+    @State private var dateLocale = FileManager.shared.dateLocale
     @State private var recordingShortcut = ShortcutManager.shared.currentShortcut
     @State private var expandedPath: String = ""
+    @State private var dateHeaderPreview: String = ""
     
     var body: some View {
         VStack(spacing: 20) {
@@ -98,6 +101,37 @@ struct SettingsView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 5) {
+                        Text("Date Header Format")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        TextField("yyyy-MM-dd (EEEE)", text: $dateHeaderFormat)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .onChange(of: dateHeaderFormat) { _ in
+                                updateDateHeaderPreview()
+                            }
+                        HStack {
+                            Text("Locale:")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            TextField("en_US", text: $dateLocale)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .frame(width: 100)
+                                .onChange(of: dateLocale) { _ in
+                                    updateDateHeaderPreview()
+                                }
+                            Text("(e.g., en_US, ja_JP, fr_FR)")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                        Text("Preview: \(dateHeaderPreview)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .onAppear {
+                                updateDateHeaderPreview()
+                            }
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 5) {
                         Text("Current file path:")
                             .font(.caption2)
                             .foregroundColor(.secondary)
@@ -140,13 +174,19 @@ struct SettingsView: View {
             }
             .padding()
         }
-        .frame(width: 500, height: 400)
+        .frame(width: 500, height: 500)
         .padding()
     }
     
     private func saveSettings() {
         FileManager.shared.filePathTemplate = filePathTemplate
         FileManager.shared.noteTemplate = noteTemplate
+        FileManager.shared.dateHeaderFormat = dateHeaderFormat
+        FileManager.shared.dateLocale = dateLocale
+    }
+    
+    private func updateDateHeaderPreview() {
+        dateHeaderPreview = FileManager.shared.getDateHeaderPreview()
     }
     
     private func closeWindow() {

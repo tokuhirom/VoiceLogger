@@ -6,6 +6,8 @@ class FileManager {
     
     private let filePathTemplateKey = "FilePathTemplate"
     private let noteTemplateKey = "NoteTemplate"
+    private let dateHeaderFormatKey = "DateHeaderFormat"
+    private let dateLocaleKey = "DateLocale"
     
     private init() {}
     
@@ -24,6 +26,24 @@ class FileManager {
         }
         set {
             UserDefaults.standard.set(newValue, forKey: noteTemplateKey)
+        }
+    }
+    
+    var dateHeaderFormat: String {
+        get {
+            UserDefaults.standard.string(forKey: dateHeaderFormatKey) ?? "yyyy-MM-dd (EEEE)"
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: dateHeaderFormatKey)
+        }
+    }
+    
+    var dateLocale: String {
+        get {
+            UserDefaults.standard.string(forKey: dateLocaleKey) ?? "en_US"
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: dateLocaleKey)
         }
     }
     
@@ -109,8 +129,8 @@ class FileManager {
             if isNewFile {
                 // Create new file with date header
                 let dateFormatter = DateFormatter()
-                dateFormatter.locale = Locale(identifier: "en_US")
-                dateFormatter.dateFormat = "yyyy-MM-dd (EEEE)"
+                dateFormatter.locale = Locale(identifier: dateLocale)
+                dateFormatter.dateFormat = dateHeaderFormat
                 let dateHeader = "# \(dateFormatter.string(from: Date()))\n\n"
                 
                 let initialContent = dateHeader + formattedText
@@ -155,5 +175,12 @@ class FileManager {
     
     func getCurrentLogFilePath() -> String {
         return expandPath(filePathTemplate)
+    }
+    
+    func getDateHeaderPreview() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: dateLocale)
+        formatter.dateFormat = dateHeaderFormat
+        return "# \(formatter.string(from: Date()))"
     }
 }

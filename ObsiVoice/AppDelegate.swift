@@ -339,7 +339,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let settingsView = SettingsView()
             
             settingsWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 500, height: 400),
+                contentRect: NSRect(x: 0, y: 0, width: 500, height: 500),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
