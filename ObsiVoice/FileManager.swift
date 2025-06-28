@@ -9,6 +9,7 @@ class FileManager {
     private let dateHeaderFormatKey = "DateHeaderFormat"
     private let dateLocaleKey = "DateLocale"
     private let showNotificationsKey = "ShowNotifications"
+    private let autoStartRecordingKey = "AutoStartRecording"
     
     private init() {}
     
@@ -58,6 +59,15 @@ class FileManager {
         }
         set {
             UserDefaults.standard.set(newValue, forKey: showNotificationsKey)
+        }
+    }
+    
+    var autoStartRecording: Bool {
+        get {
+            return UserDefaults.standard.bool(forKey: autoStartRecordingKey)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: autoStartRecordingKey)
         }
     }
     

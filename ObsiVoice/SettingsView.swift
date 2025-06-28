@@ -6,6 +6,7 @@ struct SettingsView: View {
     @State private var dateHeaderFormat = FileManager.shared.dateHeaderFormat
     @State private var dateLocale = FileManager.shared.dateLocale
     @State private var showNotifications = FileManager.shared.showNotifications
+    @State private var autoStartRecording = FileManager.shared.autoStartRecording
     @State private var recordingShortcut = ShortcutManager.shared.currentShortcut
     @State private var expandedPath: String = ""
     @State private var dateHeaderPreview: String = ""
@@ -159,6 +160,9 @@ struct SettingsView: View {
                     
                     Toggle("Show notifications after transcription", isOn: $showNotifications)
                         .font(.body)
+                    
+                    Toggle("Start recording automatically on launch", isOn: $autoStartRecording)
+                        .font(.body)
                 }
                 .padding()
             }
@@ -195,6 +199,7 @@ struct SettingsView: View {
         FileManager.shared.dateHeaderFormat = dateHeaderFormat
         FileManager.shared.dateLocale = dateLocale
         FileManager.shared.showNotifications = showNotifications
+        FileManager.shared.autoStartRecording = autoStartRecording
     }
     
     private func updateDateHeaderPreview() {

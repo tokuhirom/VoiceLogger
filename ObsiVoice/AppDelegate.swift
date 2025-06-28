@@ -16,6 +16,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         
         setupMenuBar()
         setupShortcuts()
+        
+        // Auto-start recording if enabled
+        if FileManager.shared.autoStartRecording {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                self?.startRecording()
+            }
+        }
     }
     
     private func ensureInAccessibilityList() {
