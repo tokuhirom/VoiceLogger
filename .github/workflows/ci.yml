@@ -25,6 +25,7 @@ jobs:
           -scheme VoiceLogger \
           -configuration Debug \
           -destination 'platform=macOS' \
+          -derivedDataPath build \
           clean build \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO
@@ -37,6 +38,7 @@ jobs:
         xcodebuild test -project VoiceLogger.xcodeproj \
           -scheme VoiceLogger \
           -destination 'platform=macOS' \
+          -derivedDataPath build \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
           | xcpretty --report junit --output test-results.xml
@@ -51,8 +53,8 @@ jobs:
     
     - name: Archive build artifacts
       run: |
-        cd build/Debug
-        zip -r ../../VoiceLogger.zip VoiceLogger.app
+        cd build/Build/Products/Debug
+        zip -r ../../../../VoiceLogger.zip VoiceLogger.app
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
