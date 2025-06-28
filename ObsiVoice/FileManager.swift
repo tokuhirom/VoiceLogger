@@ -1,4 +1,5 @@
 import Foundation
+import AppKit
 
 class FileManager {
     static let shared = FileManager()
@@ -122,25 +123,30 @@ class FileManager {
         }
     }
     
-    func testFileAccess(completion: @escaping (Bool, String?) -> Void) {
-        let testPath = expandPath(filePathTemplate)
-        let url = URL(fileURLWithPath: testPath)
-        let directory = url.deletingLastPathComponent()
+    func openCurrentLogFile() {
+        let filePath = expandPath(filePathTemplate)
+        let url = URL(fileURLWithPath: filePath)
         
-        // Try to create directory
-        do {
-            try Foundation.FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
-            
-            // Try to write a test file
-            let testContent = "# VoiceLogger Test\nThis is a test file created at \(Date())"
-            let testUrl = directory.appendingPathComponent(".voicelogger_test")
-            
-            try testContent.write(to: testUrl, atomically: true, encoding: .utf8)
-            try Foundation.FileManager.default.removeItem(at: testUrl)
-            
-            completion(true, nil)
-        } catch {
-            completion(false, "Cannot write to \(directory.path): \(error.localizedDescription)")
+        if Foundation.FileManager.default.fileExists(atPath: filePath) {
+            NSWorkspace.shared.open(url)
+        } else {
+            // If file doesn't exist, open the directory
+            let directory = url.deletingLastPathComponent()
+            if Foundation.FileManager.default.fileExists(atPath: directory.path) {
+                NSWorkspace.shared.open(directory)
+            } else {
+                // Try to create directory and open it
+                do {
+                    try Foundation.FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
+                    NSWorkspace.shared.open(directory)
+                } catch {
+                    print("Failed to create directory: \(error)")
+                }
+            }
         }
+    }
+    
+    func getCurrentLogFilePath() -> String {
+        return expandPath(filePathTemplate)
     }
 }

@@ -190,7 +190,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         fileSubmenu.addItem(pathItem)
         
         fileSubmenu.addItem(NSMenuItem(title: "Set File Path...", action: #selector(setFilePath), keyEquivalent: ""))
-        fileSubmenu.addItem(NSMenuItem(title: "Test File Access", action: #selector(testFileAccess), keyEquivalent: ""))
+        fileSubmenu.addItem(NSMenuItem(title: "Open Log File", action: #selector(openLogFile), keyEquivalent: ""))
         
         fileItem.submenu = fileSubmenu
         menu.addItem(fileItem)
@@ -373,16 +373,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
     }
     
-    @objc private func testFileAccess() {
-        FileManager.shared.testFileAccess { [weak self] success, error in
-            DispatchQueue.main.async {
-                if success {
-                    self?.showAlert(title: "Success", message: "File access test successful!")
-                } else {
-                    self?.showAlert(title: "File Access Failed", message: error ?? "Unknown error")
-                }
-            }
-        }
+    @objc private func openLogFile() {
+        FileManager.shared.openCurrentLogFile()
     }
     
     // MARK: - NSMenuDelegate

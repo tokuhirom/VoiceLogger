@@ -4,8 +4,7 @@ struct SettingsView: View {
     @State private var filePathTemplate = FileManager.shared.filePathTemplate
     @State private var noteTemplate = FileManager.shared.noteTemplate
     @State private var recordingShortcut = ShortcutManager.shared.currentShortcut
-    @State private var showingFileTest = false
-    @State private var fileTestResult: (success: Bool, message: String)?
+    @State private var expandedPath: String = ""
     
     var body: some View {
         VStack(spacing: 20) {
@@ -98,16 +97,24 @@ struct SettingsView: View {
                             .foregroundColor(.secondary)
                     }
                     
-                    HStack {
-                        Button("Test File Access") {
-                            testFileAccess()
-                        }
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("Current file path:")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        Text(expandedPath.isEmpty ? FileManager.shared.getCurrentLogFilePath() : expandedPath)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .lineLimit(2)
+                            .truncationMode(.middle)
+                            .onAppear {
+                                expandedPath = FileManager.shared.getCurrentLogFilePath()
+                            }
+                            .onChange(of: filePathTemplate) { _ in
+                                expandedPath = FileManager.shared.getCurrentLogFilePath()
+                            }
                         
-                        if let result = fileTestResult {
-                            Image(systemName: result.success ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                .foregroundColor(result.success ? .green : .red)
-                            Text(result.message)
-                                .font(.caption)
+                        Button("Open Log File") {
+                            FileManager.shared.openCurrentLogFile()
                         }
                     }
                 }
@@ -135,18 +142,6 @@ struct SettingsView: View {
         }
         .frame(width: 500, height: 400)
         .padding()
-    }
-    
-    private func testFileAccess() {
-        FileManager.shared.filePathTemplate = filePathTemplate
-        FileManager.shared.testFileAccess { success, error in
-            fileTestResult = (success, success ? "File access successful!" : error ?? "Failed")
-            
-            // Clear the result after 3 seconds
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                fileTestResult = nil
-            }
-        }
     }
     
     private func saveSettings() {
