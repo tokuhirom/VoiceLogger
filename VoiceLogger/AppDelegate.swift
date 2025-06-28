@@ -208,6 +208,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSUserNotifi
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ","))
         menu.addItem(NSMenuItem.separator())
+        
+        // Add version info
+        let versionString = getVersionString()
+        let versionItem = NSMenuItem(title: versionString, action: nil, keyEquivalent: "")
+        versionItem.isEnabled = false
+        menu.addItem(versionItem)
+        
+        menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Quit VoiceLogger", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         
         statusItem.menu = menu
@@ -391,6 +399,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSUserNotifi
     
     @objc private func openLogFile() {
         FileManager.shared.openCurrentLogFile()
+    }
+    
+    private func getVersionString() -> String {
+        let bundle = Bundle.main
+        let version = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Unknown"
+        let build = bundle.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "Unknown"
+        return "Version \(version) (\(build))"
     }
     
     // MARK: - NSMenuDelegate
