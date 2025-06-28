@@ -104,17 +104,24 @@ class FileManager {
         
         // Append to file
         do {
-            let dataToAppend = "\n\(formattedText)".data(using: .utf8)!
+            let isNewFile = !Foundation.FileManager.default.fileExists(atPath: filePath)
             
-            if Foundation.FileManager.default.fileExists(atPath: filePath) {
+            if isNewFile {
+                // Create new file with date header
+                let dateFormatter = DateFormatter()
+                dateFormatter.locale = Locale(identifier: "ja_JP")
+                dateFormatter.dateFormat = "yyyy-MM-dd (EEEE)"
+                let dateHeader = "# \(dateFormatter.string(from: Date()))\n\n"
+                
+                let initialContent = dateHeader + formattedText
+                try initialContent.write(to: url, atomically: true, encoding: .utf8)
+            } else {
                 // Append to existing file
+                let dataToAppend = "\n\(formattedText)".data(using: .utf8)!
                 let fileHandle = try FileHandle(forWritingTo: url)
                 fileHandle.seekToEndOfFile()
                 fileHandle.write(dataToAppend)
                 fileHandle.closeFile()
-            } else {
-                // Create new file
-                try formattedText.write(to: url, atomically: true, encoding: .utf8)
             }
             
             print("Successfully wrote to: \(filePath)")
