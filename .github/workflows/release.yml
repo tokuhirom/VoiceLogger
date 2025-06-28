@@ -1,0 +1,78 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-release:
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Select Xcode
+      run: sudo xcode-select -s /Applications/Xcode.app
+    
+    - name: Build Release
+      run: |
+        xcodebuild -project ObsiVoice.xcodeproj \
+          -scheme ObsiVoice \
+          -configuration Release \
+          -destination 'platform=macOS' \
+          clean build \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO
+    
+    - name: Create DMG
+      run: |
+        # Create a temporary directory for DMG contents
+        mkdir -p dmg-contents
+        cp -R build/Release/ObsiVoice.app dmg-contents/VoiceLogger.app
+        
+        # Create Applications symlink
+        ln -s /Applications dmg-contents/Applications
+        
+        # Create DMG
+        hdiutil create -volname "VoiceLogger" \
+          -srcfolder dmg-contents \
+          -ov -format UDZO \
+          VoiceLogger.dmg
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: VoiceLogger ${{ github.ref }}
+        body: |
+          VoiceLogger release ${{ github.ref }}
+          
+          ## Changes
+          - See commit history for changes
+          
+          ## Installation
+          1. Download VoiceLogger.dmg
+          2. Open the DMG file
+          3. Drag VoiceLogger to Applications folder
+          4. Launch VoiceLogger from Applications
+          
+          ## Permissions Required
+          - Microphone access
+          - Speech recognition
+          - Accessibility (for global shortcuts)
+        draft: false
+        prerelease: false
+    
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./VoiceLogger.dmg
+        asset_name: VoiceLogger.dmg
+        asset_content_type: application/x-apple-diskimage

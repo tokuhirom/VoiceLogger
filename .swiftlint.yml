@@ -1,0 +1,45 @@
+disabled_rules:
+  - trailing_whitespace
+  - line_length
+  - function_body_length
+  - file_length
+  - type_body_length
+
+opt_in_rules:
+  - empty_count
+  - closure_spacing
+  - contains_over_first_not_nil
+  - fatal_error_message
+  - first_where
+  - modifier_order
+  - toggle_bool
+
+excluded:
+  - Pods
+  - build
+  - DerivedData
+  - .build
+  - ObsiVoiceTests
+  - ObsiVoiceUITests
+
+identifier_name:
+  min_length:
+    warning: 2
+    error: 1
+  max_length:
+    warning: 40
+    error: 50
+
+type_name:
+  min_length:
+    warning: 3
+    error: 2
+  max_length:
+    warning: 40
+    error: 50
+
+force_cast: warning
+force_try: warning
+
+vertical_whitespace:
+  max_empty_lines: 2
