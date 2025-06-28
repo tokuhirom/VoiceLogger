@@ -1,9 +1,8 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [created]
 
 jobs:
   build-release:
@@ -11,15 +10,18 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.release.tag_name }}
     
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode.app
     
-    - name: Extract version from tag
+    - name: Extract version from release
       id: get_version
       run: |
-        # Extract version from tag (e.g., v1.2.3 -> 1.2.3)
-        VERSION=${GITHUB_REF#refs/tags/v}
+        # Extract version from release tag (e.g., v1.2.3 -> 1.2.3)
+        VERSION=${{ github.event.release.tag_name }}
+        VERSION=${VERSION#v}
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
         echo "Version: $VERSION"
     
@@ -50,25 +52,11 @@ jobs:
           -ov -format UDZO \
           VoiceLogger.dmg
     
-    - name: Create Release
+    - name: Upload Release Asset
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        gh release create "${{ github.ref_name }}" \
-          --title "VoiceLogger ${{ steps.get_version.outputs.VERSION }}" \
-          --notes "VoiceLogger release ${{ steps.get_version.outputs.VERSION }}
-        
-        ## Changes
-        - See commit history for changes
-        
-        ## Installation
-        1. Download VoiceLogger.dmg
-        2. Open the DMG file
-        3. Drag VoiceLogger to Applications folder
-        4. Launch VoiceLogger from Applications
-        
-        ## Permissions Required
-        - Microphone access
-        - Speech recognition
-        - Accessibility (for global shortcuts)" \
-          VoiceLogger.dmg
+        # Upload DMG to the existing release
+        gh release upload "${{ github.event.release.tag_name }}" \
+          VoiceLogger.dmg \
+          --clobber
