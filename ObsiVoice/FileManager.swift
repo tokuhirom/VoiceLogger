@@ -109,7 +109,7 @@ class FileManager {
             if isNewFile {
                 // Create new file with date header
                 let dateFormatter = DateFormatter()
-                dateFormatter.locale = Locale(identifier: "ja_JP")
+                dateFormatter.locale = Locale(identifier: "en_US")
                 dateFormatter.dateFormat = "yyyy-MM-dd (EEEE)"
                 let dateHeader = "# \(dateFormatter.string(from: Date()))\n\n"
                 
