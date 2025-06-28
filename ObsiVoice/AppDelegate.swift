@@ -65,7 +65,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "mic.fill", accessibilityDescription: "ObsiVoice")
+            button.image = NSImage(systemSymbolName: "mic.fill", accessibilityDescription: "VoiceLogger")
             button.action = #selector(togglePopover)
         }
         
@@ -145,7 +145,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 DispatchQueue.main.async {
                     let alert = NSAlert()
                     alert.messageText = "Enable Keyboard Shortcuts"
-                    alert.informativeText = "ObsiVoice uses global keyboard shortcuts to start recording from any app.\n\nPlease:\n1. Click 'Open System Preferences'\n2. Find ObsiVoice in the list\n3. Check the box next to ObsiVoice\n4. Restart ObsiVoice"
+                    alert.informativeText = "VoiceLogger uses global keyboard shortcuts to start recording from any app.\n\nPlease:\n1. Click 'Open System Preferences'\n2. Find VoiceLogger in the list\n3. Check the box next to VoiceLogger\n4. Restart VoiceLogger"
                     alert.alertStyle = .informational
                     alert.addButton(withTitle: "Open System Preferences")
                     alert.addButton(withTitle: "Skip")
@@ -205,7 +205,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ","))
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "Quit ObsiVoice", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        menu.addItem(NSMenuItem(title: "Quit VoiceLogger", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         
         statusItem.menu = menu
     }
@@ -308,14 +308,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func updateStatusItemForRecording(_ isRecording: Bool) {
         if let button = statusItem.button {
             let imageName = isRecording ? "mic.circle.fill" : "mic.fill"
-            button.image = NSImage(systemSymbolName: imageName, accessibilityDescription: "ObsiVoice")
+            button.image = NSImage(systemSymbolName: imageName, accessibilityDescription: "VoiceLogger")
         }
     }
     
     private func updateStatusItemForProcessing() {
         if let button = statusItem.button {
             // Use a different icon to show we're processing/waiting
-            button.image = NSImage(systemSymbolName: "hourglass", accessibilityDescription: "ObsiVoice Processing")
+            button.image = NSImage(systemSymbolName: "hourglass", accessibilityDescription: "VoiceLogger Processing")
         }
     }
     
@@ -356,7 +356,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 defer: false
             )
             
-            settingsWindow?.title = "ObsiVoice Settings"
+            settingsWindow?.title = "VoiceLogger Settings"
             settingsWindow?.contentView = NSHostingView(rootView: settingsView)
             settingsWindow?.center()
             settingsWindow?.isReleasedWhenClosed = false

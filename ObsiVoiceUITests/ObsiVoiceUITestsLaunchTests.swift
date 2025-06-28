@@ -1,13 +1,13 @@
 //
-//  ObsiVoiceUITestsLaunchTests.swift
-//  ObsiVoiceUITests
+//  VoiceLoggerUITestsLaunchTests.swift
+//  VoiceLoggerUITests
 //
 //  Created by 松野 徳大 on 2025/06/27.
 //
 
 import XCTest
 
-final class ObsiVoiceUITestsLaunchTests: XCTestCase {
+final class VoiceLoggerUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

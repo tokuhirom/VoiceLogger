@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-ObsiVoice is a macOS menu bar application that captures voice notes via keyboard shortcuts, transcribes them using native macOS APIs, and appends them to Obsidian daily notes via Advanced URI.
+VoiceLogger is a macOS menu bar application that captures voice notes via keyboard shortcuts, transcribes them using native macOS APIs, and appends them to Obsidian daily notes via Advanced URI.
 
 **Current Status**: Initial project setup with no features implemented yet. The codebase consists of a basic SwiftUI template.
 
@@ -12,21 +12,21 @@ ObsiVoice is a macOS menu bar application that captures voice notes via keyboard
 
 ```bash
 # Build the project
-xcodebuild -project ObsiVoice.xcodeproj -scheme ObsiVoice -configuration Debug build
+xcodebuild -project VoiceLogger.xcodeproj -scheme VoiceLogger -configuration Debug build
 
 # Run the app
-open build/Debug/ObsiVoice.app
+open build/Debug/VoiceLogger.app
 
 # Run unit tests
-xcodebuild test -project ObsiVoice.xcodeproj -scheme ObsiVoice -destination 'platform=macOS'
+xcodebuild test -project VoiceLogger.xcodeproj -scheme VoiceLogger -destination 'platform=macOS'
 
 # Clean build folder
-xcodebuild clean -project ObsiVoice.xcodeproj -scheme ObsiVoice
+xcodebuild clean -project VoiceLogger.xcodeproj -scheme VoiceLogger
 ```
 
 For development, use Xcode:
 ```bash
-open ObsiVoice.xcodeproj
+open VoiceLogger.xcodeproj
 ```
 
 ## Architecture Requirements
@@ -67,7 +67,7 @@ This app needs to be transformed from a window-based SwiftUI app to a menu bar a
 
 ## Required Entitlements
 
-Update `ObsiVoice.entitlements` to include:
+Update `VoiceLogger.entitlements` to include:
 - `com.apple.security.device.audio-input` - Microphone access
 - `NSSpeechRecognitionUsageDescription` in Info.plist
 - `NSMicrophoneUsageDescription` in Info.plist

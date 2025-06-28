@@ -251,7 +251,7 @@ class ShortcutManager {
             DispatchQueue.main.async {
                 let alert = NSAlert()
                 alert.messageText = "Accessibility Permission Required"
-                alert.informativeText = "ObsiVoice needs accessibility permissions to use global keyboard shortcuts.\n\nObsiVoice should now appear in the Accessibility list. Please enable it and restart the app."
+                alert.informativeText = "VoiceLogger needs accessibility permissions to use global keyboard shortcuts.\n\nVoiceLogger should now appear in the Accessibility list. Please enable it and restart the app."
                 alert.alertStyle = .warning
                 alert.addButton(withTitle: "Open System Preferences")
                 alert.addButton(withTitle: "Later")

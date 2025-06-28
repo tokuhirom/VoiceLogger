@@ -1,8 +1,8 @@
 # VoiceLogger 🎙️📝
 
-**VoiceLogger** (formerly ObsiVoice) is a lightweight macOS menu bar app that lets you capture voice notes via a simple keyboard shortcut. It transcribes your speech using macOS native APIs and saves the result to markdown files with customizable paths and formats.
+**VoiceLogger** (formerly VoiceLogger) is a lightweight macOS menu bar app that lets you capture voice notes via a simple keyboard shortcut. It transcribes your speech using macOS native APIs and saves the result to markdown files with customizable paths and formats.
 
-> **Note**: The project is in the process of being renamed from ObsiVoice to VoiceLogger. Some references may still use the old name.
+> **Note**: The project is in the process of being renamed from VoiceLogger to VoiceLogger. Some references may still use the old name.
 
 ---
 
@@ -40,9 +40,9 @@
 To build from source:
 
 ```bash
-git clone https://github.com/yourusername/ObsiVoice.git
-cd ObsiVoice
-open ObsiVoice.xcodeproj
+git clone https://github.com/yourusername/VoiceLogger.git
+cd VoiceLogger
+open VoiceLogger.xcodeproj
 ```
 
 Then build and run from Xcode.
@@ -52,7 +52,7 @@ Then build and run from Xcode.
 ## 🎮 Usage
 
 ### Initial Setup
-1. Launch ObsiVoice — it will appear in the macOS menu bar (🎙️ icon)
+1. Launch VoiceLogger — it will appear in the macOS menu bar (🎙️ icon)
 2. Click the menu bar icon and select "Settings..."
 3. Configure your file path template
 4. Set your preferred keyboard shortcut
@@ -95,7 +95,7 @@ VoiceLogger requires the following permissions:
    - Grant when prompted on first use
 3. **Accessibility**: For global keyboard shortcuts
    - Go to System Settings > Privacy & Security > Accessibility
-   - Enable VoiceLogger (may still show as ObsiVoice) in the list
+   - Enable VoiceLogger (may still show as VoiceLogger) in the list
 
 ---
 

@@ -19,8 +19,8 @@ excluded:
   - build
   - DerivedData
   - .build
-  - ObsiVoiceTests
-  - ObsiVoiceUITests
+  - VoiceLoggerTests
+  - VoiceLoggerUITests
 
 identifier_name:
   min_length:
