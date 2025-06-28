@@ -2,7 +2,7 @@ import Cocoa
 import SwiftUI
 import Speech
 
-class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSUserNotificationCenterDelegate {
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
     private let audioRecorder = AudioRecorder()
@@ -13,6 +13,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Ensure app appears in accessibility list immediately
         ensureInAccessibilityList()
+        
+        // Set up notification center delegate
+        NSUserNotificationCenter.default.delegate = self
         
         setupMenuBar()
         setupShortcuts()
@@ -342,6 +345,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         notification.title = title
         notification.subtitle = subtitle
         notification.soundName = NSUserNotificationDefaultSoundName
+        notification.hasActionButton = true
+        notification.actionButtonTitle = "Open"
         NSUserNotificationCenter.default.deliver(notification)
     }
     
@@ -396,5 +401,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
            let microphoneSubmenu = microphoneItem.submenu {
             updateMicrophoneMenu(microphoneSubmenu)
         }
+    }
+    
+    // MARK: - NSUserNotificationCenterDelegate
+    
+    func userNotificationCenter(_ center: NSUserNotificationCenter, didActivate notification: NSUserNotification) {
+        // Open the log file when notification is clicked
+        FileManager.shared.openCurrentLogFile()
+    }
+    
+    func userNotificationCenter(_ center: NSUserNotificationCenter, shouldPresent notification: NSUserNotification) -> Bool {
+        // Always show notifications even when app is in foreground
+        return true
     }
 }
