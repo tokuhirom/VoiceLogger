@@ -181,19 +181,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         
         menu.addItem(NSMenuItem.separator())
         
-        // Obsidian settings submenu
-        let obsidianItem = NSMenuItem(title: "Obsidian Settings", action: nil, keyEquivalent: "")
-        let obsidianSubmenu = NSMenu()
+        // File settings submenu
+        let fileItem = NSMenuItem(title: "File Settings", action: nil, keyEquivalent: "")
+        let fileSubmenu = NSMenu()
         
-        let vaultItem = NSMenuItem(title: "Vault: \(ObsidianManager.shared.vaultName.isEmpty ? "Not configured" : ObsidianManager.shared.vaultName)", action: nil, keyEquivalent: "")
-        vaultItem.isEnabled = false
-        obsidianSubmenu.addItem(vaultItem)
+        let pathItem = NSMenuItem(title: "Path: \(FileManager.shared.filePathTemplate)", action: nil, keyEquivalent: "")
+        pathItem.isEnabled = false
+        fileSubmenu.addItem(pathItem)
         
-        obsidianSubmenu.addItem(NSMenuItem(title: "Set Vault Name...", action: #selector(setVaultName), keyEquivalent: ""))
-        obsidianSubmenu.addItem(NSMenuItem(title: "Test Connection", action: #selector(testObsidianConnection), keyEquivalent: ""))
+        fileSubmenu.addItem(NSMenuItem(title: "Set File Path...", action: #selector(setFilePath), keyEquivalent: ""))
+        fileSubmenu.addItem(NSMenuItem(title: "Test File Access", action: #selector(testFileAccess), keyEquivalent: ""))
         
-        obsidianItem.submenu = obsidianSubmenu
-        menu.addItem(obsidianItem)
+        fileItem.submenu = fileSubmenu
+        menu.addItem(fileItem)
         
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ","))
@@ -313,8 +313,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
     
     private func handleTranscribedText(_ text: String) {
-        // Send to Obsidian via Advanced URI
-        ObsidianManager.shared.appendToDaily(text: text)
+        // Write to file
+        FileManager.shared.appendToFile(text: text)
         showNotification(title: "Voice Note Transcribed", subtitle: text)
     }
     
@@ -355,31 +355,31 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
     
-    @objc private func setVaultName() {
+    @objc private func setFilePath() {
         let alert = NSAlert()
-        alert.messageText = "Set Obsidian Vault Name"
-        alert.informativeText = "Enter the name of your Obsidian vault:"
+        alert.messageText = "Set File Path Template"
+        alert.informativeText = "Enter the file path template:\n\nSupported placeholders:\n%Y - Year (4 digits)\n%m - Month (2 digits)\n%d - Day (2 digits)\n%H - Hour (24h)\n%M - Minute\n%S - Second"
         alert.addButton(withTitle: "OK")
         alert.addButton(withTitle: "Cancel")
         
-        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
-        textField.stringValue = ObsidianManager.shared.vaultName
+        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 400, height: 24))
+        textField.stringValue = FileManager.shared.filePathTemplate
         alert.accessoryView = textField
         
         if alert.runModal() == .alertFirstButtonReturn {
-            ObsidianManager.shared.vaultName = textField.stringValue
-            // Refresh menu to show new vault name
+            FileManager.shared.filePathTemplate = textField.stringValue
+            // Refresh menu to show new path
             setupMenu()
         }
     }
     
-    @objc private func testObsidianConnection() {
-        ObsidianManager.shared.testConnection { [weak self] success, error in
+    @objc private func testFileAccess() {
+        FileManager.shared.testFileAccess { [weak self] success, error in
             DispatchQueue.main.async {
                 if success {
-                    self?.showAlert(title: "Success", message: "Successfully connected to Obsidian vault!")
+                    self?.showAlert(title: "Success", message: "File access test successful!")
                 } else {
-                    self?.showAlert(title: "Connection Failed", message: error ?? "Unknown error")
+                    self?.showAlert(title: "File Access Failed", message: error ?? "Unknown error")
                 }
             }
         }

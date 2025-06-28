@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @State private var vaultName = ObsidianManager.shared.vaultName
-    @State private var noteTemplate = ObsidianManager.shared.noteTemplate
+    @State private var filePathTemplate = FileManager.shared.filePathTemplate
+    @State private var noteTemplate = FileManager.shared.noteTemplate
     @State private var recordingShortcut = ShortcutManager.shared.currentShortcut
-    @State private var showingConnectionTest = false
-    @State private var connectionTestResult: (success: Bool, message: String)?
+    @State private var showingFileTest = false
+    @State private var fileTestResult: (success: Bool, message: String)?
     
     var body: some View {
         VStack(spacing: 20) {
@@ -73,15 +73,18 @@ struct SettingsView: View {
                 .padding()
             }
             
-            // Obsidian Settings
-            GroupBox(label: Label("Obsidian Integration", systemImage: "note.text")) {
+            // File Settings
+            GroupBox(label: Label("File Settings", systemImage: "folder")) {
                 VStack(alignment: .leading, spacing: 15) {
                     VStack(alignment: .leading, spacing: 5) {
-                        Text("Vault Name")
+                        Text("File Path Template")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        TextField("Your Vault Name", text: $vaultName)
+                        TextField("~/Documents/VoiceLogger/%Y%m/%Y-%m-%d.md", text: $filePathTemplate)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
+                        Text("Placeholders: %Y (year), %m (month), %d (day), %H (hour), %M (minute), %S (second)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
                     }
                     
                     VStack(alignment: .leading, spacing: 5) {
@@ -96,12 +99,11 @@ struct SettingsView: View {
                     }
                     
                     HStack {
-                        Button("Test Connection") {
-                            testConnection()
+                        Button("Test File Access") {
+                            testFileAccess()
                         }
-                        .disabled(vaultName.isEmpty)
                         
-                        if let result = connectionTestResult {
+                        if let result = fileTestResult {
                             Image(systemName: result.success ? "checkmark.circle.fill" : "xmark.circle.fill")
                                 .foregroundColor(result.success ? .green : .red)
                             Text(result.message)
@@ -135,21 +137,21 @@ struct SettingsView: View {
         .padding()
     }
     
-    private func testConnection() {
-        ObsidianManager.shared.vaultName = vaultName
-        ObsidianManager.shared.testConnection { success, error in
-            connectionTestResult = (success, success ? "Connected!" : error ?? "Failed")
+    private func testFileAccess() {
+        FileManager.shared.filePathTemplate = filePathTemplate
+        FileManager.shared.testFileAccess { success, error in
+            fileTestResult = (success, success ? "File access successful!" : error ?? "Failed")
             
             // Clear the result after 3 seconds
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                connectionTestResult = nil
+                fileTestResult = nil
             }
         }
     }
     
     private func saveSettings() {
-        ObsidianManager.shared.vaultName = vaultName
-        ObsidianManager.shared.noteTemplate = noteTemplate
+        FileManager.shared.filePathTemplate = filePathTemplate
+        FileManager.shared.noteTemplate = noteTemplate
     }
     
     private func closeWindow() {
