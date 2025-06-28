@@ -15,21 +15,31 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode.app
     
+    - name: Extract version from tag
+      id: get_version
+      run: |
+        # Extract version from tag (e.g., v1.2.3 -> 1.2.3)
+        VERSION=${GITHUB_REF#refs/tags/v}
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        echo "Version: $VERSION"
+    
     - name: Build Release
       run: |
         xcodebuild -project VoiceLogger.xcodeproj \
           -scheme VoiceLogger \
           -configuration Release \
           -destination 'platform=macOS' \
+          -derivedDataPath build \
           clean build \
           CODE_SIGN_IDENTITY="" \
-          CODE_SIGNING_REQUIRED=NO
+          CODE_SIGNING_REQUIRED=NO \
+          MARKETING_VERSION=${{ steps.get_version.outputs.VERSION }}
     
     - name: Create DMG
       run: |
         # Create a temporary directory for DMG contents
         mkdir -p dmg-contents
-        cp -R build/Release/VoiceLogger.app dmg-contents/VoiceLogger.app
+        cp -R build/Build/Products/Release/VoiceLogger.app dmg-contents/VoiceLogger.app
         
         # Create Applications symlink
         ln -s /Applications dmg-contents/Applications
@@ -47,9 +57,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
-        release_name: VoiceLogger ${{ github.ref }}
+        release_name: VoiceLogger ${{ steps.get_version.outputs.VERSION }}
         body: |
-          VoiceLogger release ${{ github.ref }}
+          VoiceLogger release ${{ steps.get_version.outputs.VERSION }}
           
           ## Changes
           - See commit history for changes
