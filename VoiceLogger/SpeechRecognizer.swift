@@ -35,8 +35,8 @@ class SpeechRecognizer: NSObject, ObservableObject {
     }
     
     func startTranscription(with request: SFSpeechAudioBufferRecognitionRequest, 
-                           completion: @escaping (String?, Error?) -> Void,
-                           onSegment: ((String) -> Void)? = nil) {
+                            completion: @escaping (String?, Error?) -> Void,
+                            onSegment: ((String) -> Void)? = nil) {
         guard isAuthorized else {
             completion(nil, NSError(domain: "SpeechRecognizer", code: 1, userInfo: [NSLocalizedDescriptionKey: "Speech recognition not authorized"]))
             return

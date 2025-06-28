@@ -74,7 +74,6 @@ struct KeyboardShortcut: Codable, Equatable {
         return result.isEmpty ? "?" : result.uppercased()
     }
 }
-
 class ShortcutManager {
     static let shared = ShortcutManager()
     
@@ -162,8 +161,19 @@ class ShortcutManager {
         
         print("Starting monitoring for shortcut: \(shortcut.displayString)")
         
-        // Define the keyDown event handler
-        let keyDownHandler: (NSEvent) -> NSEvent? = { [weak self] event in
+        // Define the event handlers
+        let keyDownHandler = createKeyDownHandler(for: shortcut)
+        let keyUpHandler = createKeyUpHandler(for: shortcut)
+        
+        // Install local monitors
+        installLocalMonitors(keyDownHandler: keyDownHandler, keyUpHandler: keyUpHandler)
+        
+        // Handle accessibility permissions and install global monitors
+        handleAccessibilityAndGlobalMonitors(keyDownHandler: keyDownHandler, keyUpHandler: keyUpHandler)
+    }
+    
+    private func createKeyDownHandler(for shortcut: KeyboardShortcut) -> (NSEvent) -> NSEvent? {
+        return { [weak self] event in
             guard let self = self else { return event }
             
             let eventModifiers = event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue
@@ -171,64 +181,79 @@ class ShortcutManager {
             if event.keyCode == shortcut.keyCode && eventModifiers == shortcut.modifierFlags {
                 // Prevent key repeat
                 if !self.isKeyPressed {
-                    self.isKeyPressed = true
-                    self.keyPressTime = Date()
-                    self.isRecordingFromHold = false
-                    
-                    print("Key down detected")
-                    
-                    // Start a timer to detect long press
-                    self.longPressTimer?.invalidate()
-                    self.longPressTimer = Timer.scheduledTimer(withTimeInterval: self.longPressThreshold, repeats: false) { _ in
-                        DispatchQueue.main.async {
-                            print("Long press detected - starting hold-to-record")
-                            self.isRecordingFromHold = true
-                            self.keyDownAction?()
-                        }
-                    }
+                    self.handleKeyDown()
                 }
                 return nil // Consume the event
             }
             return event
         }
-        
-        // Define the keyUp event handler
-        let keyUpHandler: (NSEvent) -> NSEvent? = { [weak self] event in
+    }
+    
+    private func createKeyUpHandler(for shortcut: KeyboardShortcut) -> (NSEvent) -> NSEvent? {
+        return { [weak self] event in
             guard let self = self else { return event }
             
             let eventModifiers = event.modifierFlags.rawValue & NSEvent.ModifierFlags.deviceIndependentFlagsMask.rawValue
             
             if event.keyCode == shortcut.keyCode && eventModifiers == shortcut.modifierFlags {
                 if self.isKeyPressed {
-                    self.isKeyPressed = false
-                    let pressDuration = Date().timeIntervalSince(self.keyPressTime ?? Date())
-                    
-                    print("Key up detected, duration: \(pressDuration)s")
-                    
-                    // Cancel the long press timer
-                    self.longPressTimer?.invalidate()
-                    self.longPressTimer = nil
-                    
-                    if self.isRecordingFromHold {
-                        // Was holding - stop recording
-                        print("Stopping hold-to-record")
-                        DispatchQueue.main.async {
-                            self.keyUpAction?()
-                        }
-                    } else if pressDuration < self.longPressThreshold {
-                        // Short tap - toggle recording
-                        print("Short tap detected - toggling recording")
-                        DispatchQueue.main.async {
-                            self.toggleAction?()
-                        }
-                    }
+                    self.handleKeyUp()
                 }
                 return nil // Consume the event
             }
             return event
         }
+    }
+    
+    private func handleKeyDown() {
+        isKeyPressed = true
+        keyPressTime = Date()
+        isRecordingFromHold = false
         
-        // Local monitors for when app has focus
+        print("Key down detected")
+        
+        // Start a timer to detect long press
+        startLongPressDetection()
+    }
+    
+    private func handleKeyUp() {
+        isKeyPressed = false
+        let pressDuration = Date().timeIntervalSince(keyPressTime ?? Date())
+        
+        print("Key up detected, duration: \(pressDuration)s")
+        
+        // Cancel the long press timer
+        longPressTimer?.invalidate()
+        longPressTimer = nil
+        
+        if isRecordingFromHold {
+            // Was holding - stop recording
+            print("Stopping hold-to-record")
+            DispatchQueue.main.async { [weak self] in
+                self?.keyUpAction?()
+            }
+        } else if pressDuration < longPressThreshold {
+            // Short tap - toggle recording
+            print("Short tap detected - toggling recording")
+            DispatchQueue.main.async { [weak self] in
+                self?.toggleAction?()
+            }
+        }
+    }
+    
+    private func startLongPressDetection() {
+        longPressTimer?.invalidate()
+        longPressTimer = Timer.scheduledTimer(withTimeInterval: longPressThreshold, repeats: false) { [weak self] _ in
+            DispatchQueue.main.async {
+                print("Long press detected - starting hold-to-record")
+                self?.isRecordingFromHold = true
+                self?.keyDownAction?()
+            }
+        }
+    }
+    
+    private func installLocalMonitors(keyDownHandler: @escaping (NSEvent) -> NSEvent?,
+                                      keyUpHandler: @escaping (NSEvent) -> NSEvent?) {
         localEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
             return keyDownHandler(event)
         }
@@ -237,72 +262,87 @@ class ShortcutManager {
             return keyUpHandler(event)
         }
         
-        // Global monitors for when other apps have focus
-        // Check accessibility permissions without prompting first
-        let trusted = AXIsProcessTrusted()
-        
-        if !trusted {
-            print("⚠️ Accessibility permissions not granted")
-            
-            // Try to use the API first to ensure we appear in the list
-            _ = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { _ in }
-            
-            // Show alert to user
-            DispatchQueue.main.async {
-                let alert = NSAlert()
-                alert.messageText = "Accessibility Permission Required"
-                alert.informativeText = "VoiceLogger needs accessibility permissions to use global keyboard shortcuts.\n\nVoiceLogger should now appear in the Accessibility list. Please enable it and restart the app."
-                alert.alertStyle = .warning
-                alert.addButton(withTitle: "Open System Preferences")
-                alert.addButton(withTitle: "Later")
-                
-                let response = alert.runModal()
-                if response == .alertFirstButtonReturn {
-                    // Open System Preferences directly to Accessibility
-                    if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
-                        NSWorkspace.shared.open(url)
-                    } else {
-                        // Fallback: Open System Preferences app
-                        NSWorkspace.shared.launchApplication("System Preferences")
-                    }
-                }
-            }
-            
-            // Also prompt system dialog
-            let options = NSDictionary(object: kCFBooleanTrue!, forKey: kAXTrustedCheckOptionPrompt.takeUnretainedValue() as NSString)
-            _ = AXIsProcessTrustedWithOptions(options)
-        }
-        
-        // Install global monitors if we have accessibility permissions
-        if trusted {
-            globalEventMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
-                _ = keyDownHandler(event)
-            }
-            
-            globalKeyUpMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyUp) { event in
-                _ = keyUpHandler(event)
-            }
-            
-            if globalEventMonitor != nil && globalKeyUpMonitor != nil {
-                print("✓ Global event monitors installed successfully")
-            } else {
-                print("✗ Failed to install global event monitors (unexpected)")
-            }
-        } else {
-            print("✗ Cannot install global event monitor without accessibility permissions")
-            
-            // Try again in a few seconds (user might grant permission)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
-                if AXIsProcessTrusted() {
-                    print("Accessibility permissions now granted, restarting monitoring...")
-                    self?.stopMonitoring()
-                    self?.startMonitoring()
-                }
-            }
-        }
-        
         if localEventMonitor != nil && localKeyUpMonitor != nil {
             print("Local event monitors installed successfully")
+        }
+    }
+    
+    private func handleAccessibilityAndGlobalMonitors(keyDownHandler: @escaping (NSEvent) -> NSEvent?,
+                                                      keyUpHandler: @escaping (NSEvent) -> NSEvent?) {
+        let trusted = AXIsProcessTrusted()
+        
+        if trusted {
+            installGlobalMonitors(keyDownHandler: keyDownHandler, keyUpHandler: keyUpHandler)
+        } else {
+            handleAccessibilityPermissionDenied()
+        }
+    }
+    
+    private func installGlobalMonitors(keyDownHandler: @escaping (NSEvent) -> NSEvent?,
+                                       keyUpHandler: @escaping (NSEvent) -> NSEvent?) {
+        globalEventMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
+            _ = keyDownHandler(event)
+        }
+        
+        globalKeyUpMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyUp) { event in
+            _ = keyUpHandler(event)
+        }
+        
+        if globalEventMonitor != nil && globalKeyUpMonitor != nil {
+            print("✓ Global event monitors installed successfully")
+        } else {
+            print("✗ Failed to install global event monitors (unexpected)")
+        }
+    }
+    
+    private func handleAccessibilityPermissionDenied() {
+        print("⚠️ Accessibility permissions not granted")
+        
+        // Try to use the API first to ensure we appear in the list
+        _ = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { _ in }
+        
+        // Show alert to user
+        showAccessibilityAlert()
+        
+        // Also prompt system dialog
+        let options = NSDictionary(object: kCFBooleanTrue!, forKey: kAXTrustedCheckOptionPrompt.takeUnretainedValue() as NSString)
+        _ = AXIsProcessTrustedWithOptions(options)
+        
+        print("✗ Cannot install global event monitor without accessibility permissions")
+        
+        // Try again in a few seconds (user might grant permission)
+        retryAccessibilityCheck()
+    }
+    
+    private func showAccessibilityAlert() {
+        DispatchQueue.main.async {
+            let alert = NSAlert()
+            alert.messageText = "Accessibility Permission Required"
+            alert.informativeText = "VoiceLogger needs accessibility permissions to use global keyboard shortcuts.\n\nVoiceLogger should now appear in the Accessibility list. Please enable it and restart the app."
+            alert.alertStyle = .warning
+            alert.addButton(withTitle: "Open System Preferences")
+            alert.addButton(withTitle: "Later")
+            
+            let response = alert.runModal()
+            if response == .alertFirstButtonReturn {
+                // Open System Preferences directly to Accessibility
+                if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                    NSWorkspace.shared.open(url)
+                } else {
+                    // Fallback: Open System Preferences app
+                    NSWorkspace.shared.launchApplication("System Preferences")
+                }
+            }
+        }
+    }
+    
+    private func retryAccessibilityCheck() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
+            if AXIsProcessTrusted() {
+                print("Accessibility permissions now granted, restarting monitoring...")
+                self?.stopMonitoring()
+                self?.startMonitoring()
+            }
         }
     }
     
