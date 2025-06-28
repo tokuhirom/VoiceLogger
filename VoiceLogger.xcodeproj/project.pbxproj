@@ -6,6 +6,22 @@
 	objectVersion = 56;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DD0000000000000000000001 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000001 /* AppDelegate.swift */; };
+		DD0000000000000000000002 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000003 /* AudioRecorder.swift */; };
+		DD0000000000000000000003 /* FileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000004 /* FileManager.swift */; };
+		DD0000000000000000000004 /* LaunchAtLoginHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000006 /* LaunchAtLoginHelper.swift */; };
+		DD0000000000000000000005 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000007 /* SettingsView.swift */; };
+		DD0000000000000000000006 /* ShortcutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000008 /* ShortcutManager.swift */; };
+		DD0000000000000000000007 /* ShortcutRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000009 /* ShortcutRecorderView.swift */; };
+		DD0000000000000000000008 /* SpeechRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000000A /* SpeechRecognizer.swift */; };
+		DD0000000000000000000009 /* VoiceLoggerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000000C /* VoiceLoggerApp.swift */; };
+		EE0000000000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000002 /* Assets.xcassets */; };
+		FF0000000000000000000001 /* VoiceLoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000001 /* VoiceLoggerTests.swift */; };
+		FF0000000000000000000002 /* VoiceLoggerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000001 /* VoiceLoggerUITests.swift */; };
+		FF0000000000000000000003 /* VoiceLoggerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000002 /* VoiceLoggerUITestsLaunchTests.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		66EFEA862E0ED1F8001676F5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,25 +43,23 @@
 		66EFEA772E0ED1F6001676F5 /* VoiceLogger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoiceLogger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66EFEA852E0ED1F8001676F5 /* VoiceLoggerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VoiceLoggerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		66EFEA8F2E0ED1F8001676F5 /* VoiceLoggerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VoiceLoggerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA0000000000000000000001 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		AA0000000000000000000002 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AA0000000000000000000003 /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
+		AA0000000000000000000004 /* FileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManager.swift; sourceTree = "<group>"; };
+		AA0000000000000000000005 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA0000000000000000000006 /* LaunchAtLoginHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginHelper.swift; sourceTree = "<group>"; };
+		AA0000000000000000000007 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000008 /* ShortcutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutManager.swift; sourceTree = "<group>"; };
+		AA0000000000000000000009 /* ShortcutRecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorderView.swift; sourceTree = "<group>"; };
+		AA000000000000000000000A /* SpeechRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognizer.swift; sourceTree = "<group>"; };
+		AA000000000000000000000B /* VoiceLogger.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VoiceLogger.entitlements; sourceTree = "<group>"; };
+		AA000000000000000000000C /* VoiceLoggerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceLoggerApp.swift; sourceTree = "<group>"; };
+		BB0000000000000000000001 /* VoiceLoggerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceLoggerTests.swift; sourceTree = "<group>"; };
+		CC0000000000000000000001 /* VoiceLoggerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceLoggerUITests.swift; sourceTree = "<group>"; };
+		CC0000000000000000000002 /* VoiceLoggerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceLoggerUITestsLaunchTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		66EFEA792E0ED1F6001676F5 /* VoiceLogger */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = VoiceLogger;
-			sourceTree = "<group>";
-		};
-		66EFEA882E0ED1F8001676F5 /* VoiceLoggerTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = VoiceLoggerTests;
-			sourceTree = "<group>";
-		};
-		66EFEA922E0ED1F8001676F5 /* VoiceLoggerUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = VoiceLoggerUITests;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		66EFEA742E0ED1F6001676F5 /* Frameworks */ = {
@@ -92,6 +106,42 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		66EFEA792E0ED1F6001676F5 /* VoiceLogger */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000001 /* AppDelegate.swift */,
+				AA0000000000000000000002 /* Assets.xcassets */,
+				AA0000000000000000000003 /* AudioRecorder.swift */,
+				AA0000000000000000000004 /* FileManager.swift */,
+				AA0000000000000000000005 /* Info.plist */,
+				AA0000000000000000000006 /* LaunchAtLoginHelper.swift */,
+				AA0000000000000000000007 /* SettingsView.swift */,
+				AA0000000000000000000008 /* ShortcutManager.swift */,
+				AA0000000000000000000009 /* ShortcutRecorderView.swift */,
+				AA000000000000000000000A /* SpeechRecognizer.swift */,
+				AA000000000000000000000B /* VoiceLogger.entitlements */,
+				AA000000000000000000000C /* VoiceLoggerApp.swift */,
+			);
+			path = VoiceLogger;
+			sourceTree = "<group>";
+		};
+		66EFEA882E0ED1F8001676F5 /* VoiceLoggerTests */ = {
+			isa = PBXGroup;
+			children = (
+				BB0000000000000000000001 /* VoiceLoggerTests.swift */,
+			);
+			path = VoiceLoggerTests;
+			sourceTree = "<group>";
+		};
+		66EFEA922E0ED1F8001676F5 /* VoiceLoggerUITests */ = {
+			isa = PBXGroup;
+			children = (
+				CC0000000000000000000001 /* VoiceLoggerUITests.swift */,
+				CC0000000000000000000002 /* VoiceLoggerUITestsLaunchTests.swift */,
+			);
+			path = VoiceLoggerUITests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -106,9 +156,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				66EFEA792E0ED1F6001676F5 /* VoiceLogger */,
 			);
 			name = VoiceLogger;
 			packageProductDependencies = (
@@ -130,9 +177,6 @@
 			dependencies = (
 				66EFEA872E0ED1F8001676F5 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				66EFEA882E0ED1F8001676F5 /* VoiceLoggerTests */,
-			);
 			name = VoiceLoggerTests;
 			packageProductDependencies = (
 			);
@@ -152,9 +196,6 @@
 			);
 			dependencies = (
 				66EFEA912E0ED1F8001676F5 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				66EFEA922E0ED1F8001676F5 /* VoiceLoggerUITests */,
 			);
 			name = VoiceLoggerUITests;
 			packageProductDependencies = (
@@ -195,7 +236,6 @@
 			);
 			mainGroup = 66EFEA6E2E0ED1F6001676F5;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			productRefGroup = 66EFEA782E0ED1F6001676F5 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -211,7 +251,8 @@
 		66EFEA752E0ED1F6001676F5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
-			files = (
+						files = (
+				EE0000000000000000000001 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,21 +276,33 @@
 		66EFEA732E0ED1F6001676F5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
-			files = (
+						files = (
+				DD0000000000000000000001 /* AppDelegate.swift in Sources */,
+				DD0000000000000000000002 /* AudioRecorder.swift in Sources */,
+				DD0000000000000000000003 /* FileManager.swift in Sources */,
+				DD0000000000000000000004 /* LaunchAtLoginHelper.swift in Sources */,
+				DD0000000000000000000005 /* SettingsView.swift in Sources */,
+				DD0000000000000000000006 /* ShortcutManager.swift in Sources */,
+				DD0000000000000000000007 /* ShortcutRecorderView.swift in Sources */,
+				DD0000000000000000000008 /* SpeechRecognizer.swift in Sources */,
+				DD0000000000000000000009 /* VoiceLoggerApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		66EFEA812E0ED1F8001676F5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
-			files = (
+						files = (
+				FF0000000000000000000001 /* VoiceLoggerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		66EFEA8B2E0ED1F8001676F5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
-			files = (
+						files = (
+				FF0000000000000000000002 /* VoiceLoggerUITests.swift in Sources */,
+				FF0000000000000000000003 /* VoiceLoggerUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
