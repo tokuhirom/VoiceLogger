@@ -12,37 +12,37 @@
 			containerPortal = 66EFEA6F2E0ED1F6001676F5 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 66EFEA762E0ED1F6001676F5;
-			remoteInfo = ObsiVoice;
+			remoteInfo = VoiceLogger;
 		};
 		66EFEA902E0ED1F8001676F5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 66EFEA6F2E0ED1F6001676F5 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 66EFEA762E0ED1F6001676F5;
-			remoteInfo = ObsiVoice;
+			remoteInfo = VoiceLogger;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		66EFEA772E0ED1F6001676F5 /* ObsiVoice.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ObsiVoice.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		66EFEA852E0ED1F8001676F5 /* ObsiVoiceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ObsiVoiceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		66EFEA8F2E0ED1F8001676F5 /* ObsiVoiceUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ObsiVoiceUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		66EFEA772E0ED1F6001676F5 /* VoiceLogger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoiceLogger.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		66EFEA852E0ED1F8001676F5 /* VoiceLoggerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VoiceLoggerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		66EFEA8F2E0ED1F8001676F5 /* VoiceLoggerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VoiceLoggerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		66EFEA792E0ED1F6001676F5 /* ObsiVoice */ = {
+		66EFEA792E0ED1F6001676F5 /* VoiceLogger */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ObsiVoice;
+			path = VoiceLogger;
 			sourceTree = "<group>";
 		};
-		66EFEA882E0ED1F8001676F5 /* ObsiVoiceTests */ = {
+		66EFEA882E0ED1F8001676F5 /* VoiceLoggerTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ObsiVoiceTests;
+			path = VoiceLoggerTests;
 			sourceTree = "<group>";
 		};
-		66EFEA922E0ED1F8001676F5 /* ObsiVoiceUITests */ = {
+		66EFEA922E0ED1F8001676F5 /* VoiceLoggerUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ObsiVoiceUITests;
+			path = VoiceLoggerUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,9 +75,9 @@
 		66EFEA6E2E0ED1F6001676F5 = {
 			isa = PBXGroup;
 			children = (
-				66EFEA792E0ED1F6001676F5 /* ObsiVoice */,
-				66EFEA882E0ED1F8001676F5 /* ObsiVoiceTests */,
-				66EFEA922E0ED1F8001676F5 /* ObsiVoiceUITests */,
+				66EFEA792E0ED1F6001676F5 /* VoiceLogger */,
+				66EFEA882E0ED1F8001676F5 /* VoiceLoggerTests */,
+				66EFEA922E0ED1F8001676F5 /* VoiceLoggerUITests */,
 				66EFEA782E0ED1F6001676F5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -85,9 +85,9 @@
 		66EFEA782E0ED1F6001676F5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				66EFEA772E0ED1F6001676F5 /* ObsiVoice.app */,
-				66EFEA852E0ED1F8001676F5 /* ObsiVoiceTests.xctest */,
-				66EFEA8F2E0ED1F8001676F5 /* ObsiVoiceUITests.xctest */,
+				66EFEA772E0ED1F6001676F5 /* VoiceLogger.app */,
+				66EFEA852E0ED1F8001676F5 /* VoiceLoggerTests.xctest */,
+				66EFEA8F2E0ED1F8001676F5 /* VoiceLoggerUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,9 +95,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		66EFEA762E0ED1F6001676F5 /* ObsiVoice */ = {
+		66EFEA762E0ED1F6001676F5 /* VoiceLogger */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 66EFEA992E0ED1F8001676F5 /* Build configuration list for PBXNativeTarget "ObsiVoice" */;
+			buildConfigurationList = 66EFEA992E0ED1F8001676F5 /* Build configuration list for PBXNativeTarget "VoiceLogger" */;
 			buildPhases = (
 				66EFEA732E0ED1F6001676F5 /* Sources */,
 				66EFEA742E0ED1F6001676F5 /* Frameworks */,
@@ -108,18 +108,18 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				66EFEA792E0ED1F6001676F5 /* ObsiVoice */,
+				66EFEA792E0ED1F6001676F5 /* VoiceLogger */,
 			);
-			name = ObsiVoice;
+			name = VoiceLogger;
 			packageProductDependencies = (
 			);
-			productName = ObsiVoice;
-			productReference = 66EFEA772E0ED1F6001676F5 /* ObsiVoice.app */;
+			productName = VoiceLogger;
+			productReference = 66EFEA772E0ED1F6001676F5 /* VoiceLogger.app */;
 			productType = "com.apple.product-type.application";
 		};
-		66EFEA842E0ED1F8001676F5 /* ObsiVoiceTests */ = {
+		66EFEA842E0ED1F8001676F5 /* VoiceLoggerTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 66EFEA9C2E0ED1F8001676F5 /* Build configuration list for PBXNativeTarget "ObsiVoiceTests" */;
+			buildConfigurationList = 66EFEA9C2E0ED1F8001676F5 /* Build configuration list for PBXNativeTarget "VoiceLoggerTests" */;
 			buildPhases = (
 				66EFEA812E0ED1F8001676F5 /* Sources */,
 				66EFEA822E0ED1F8001676F5 /* Frameworks */,
@@ -131,18 +131,18 @@
 				66EFEA872E0ED1F8001676F5 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				66EFEA882E0ED1F8001676F5 /* ObsiVoiceTests */,
+				66EFEA882E0ED1F8001676F5 /* VoiceLoggerTests */,
 			);
-			name = ObsiVoiceTests;
+			name = VoiceLoggerTests;
 			packageProductDependencies = (
 			);
-			productName = ObsiVoiceTests;
-			productReference = 66EFEA852E0ED1F8001676F5 /* ObsiVoiceTests.xctest */;
+			productName = VoiceLoggerTests;
+			productReference = 66EFEA852E0ED1F8001676F5 /* VoiceLoggerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		66EFEA8E2E0ED1F8001676F5 /* ObsiVoiceUITests */ = {
+		66EFEA8E2E0ED1F8001676F5 /* VoiceLoggerUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 66EFEA9F2E0ED1F8001676F5 /* Build configuration list for PBXNativeTarget "ObsiVoiceUITests" */;
+			buildConfigurationList = 66EFEA9F2E0ED1F8001676F5 /* Build configuration list for PBXNativeTarget "VoiceLoggerUITests" */;
 			buildPhases = (
 				66EFEA8B2E0ED1F8001676F5 /* Sources */,
 				66EFEA8C2E0ED1F8001676F5 /* Frameworks */,
@@ -154,13 +154,13 @@
 				66EFEA912E0ED1F8001676F5 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				66EFEA922E0ED1F8001676F5 /* ObsiVoiceUITests */,
+				66EFEA922E0ED1F8001676F5 /* VoiceLoggerUITests */,
 			);
-			name = ObsiVoiceUITests;
+			name = VoiceLoggerUITests;
 			packageProductDependencies = (
 			);
-			productName = ObsiVoiceUITests;
-			productReference = 66EFEA8F2E0ED1F8001676F5 /* ObsiVoiceUITests.xctest */;
+			productName = VoiceLoggerUITests;
+			productReference = 66EFEA8F2E0ED1F8001676F5 /* VoiceLoggerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -186,7 +186,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 66EFEA722E0ED1F6001676F5 /* Build configuration list for PBXProject "ObsiVoice" */;
+			buildConfigurationList = 66EFEA722E0ED1F6001676F5 /* Build configuration list for PBXProject "VoiceLogger" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -200,9 +200,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				66EFEA762E0ED1F6001676F5 /* ObsiVoice */,
-				66EFEA842E0ED1F8001676F5 /* ObsiVoiceTests */,
-				66EFEA8E2E0ED1F8001676F5 /* ObsiVoiceUITests */,
+				66EFEA762E0ED1F6001676F5 /* VoiceLogger */,
+				66EFEA842E0ED1F8001676F5 /* VoiceLoggerTests */,
+				66EFEA8E2E0ED1F8001676F5 /* VoiceLoggerUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,12 +258,12 @@
 /* Begin PBXTargetDependency section */
 		66EFEA872E0ED1F8001676F5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 66EFEA762E0ED1F6001676F5 /* ObsiVoice */;
+			target = 66EFEA762E0ED1F6001676F5 /* VoiceLogger */;
 			targetProxy = 66EFEA862E0ED1F8001676F5 /* PBXContainerItemProxy */;
 		};
 		66EFEA912E0ED1F8001676F5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 66EFEA762E0ED1F6001676F5 /* ObsiVoice */;
+			target = 66EFEA762E0ED1F6001676F5 /* VoiceLogger */;
 			targetProxy = 66EFEA902E0ED1F8001676F5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -388,14 +388,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = ObsiVoice/ObsiVoice.entitlements;
+				CODE_SIGN_ENTITLEMENTS = VoiceLogger/VoiceLogger.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LZN2M9S453;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ObsiVoice/Info.plist;
+				INFOPLIST_FILE = VoiceLogger/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -411,7 +411,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = org.64p.ObsiVoice;
+				PRODUCT_BUNDLE_IDENTIFIER = org.64p.VoiceLogger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -428,14 +428,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = ObsiVoice/ObsiVoice.entitlements;
+				CODE_SIGN_ENTITLEMENTS = VoiceLogger/VoiceLogger.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LZN2M9S453;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ObsiVoice/Info.plist;
+				INFOPLIST_FILE = VoiceLogger/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -451,7 +451,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = org.64p.ObsiVoice;
+				PRODUCT_BUNDLE_IDENTIFIER = org.64p.VoiceLogger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -473,14 +473,14 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = org.64p.ObsiVoiceTests;
+				PRODUCT_BUNDLE_IDENTIFIER = org.64p.VoiceLoggerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ObsiVoice.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ObsiVoice";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VoiceLogger.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/VoiceLogger";
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Debug;
@@ -495,14 +495,14 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = org.64p.ObsiVoiceTests;
+				PRODUCT_BUNDLE_IDENTIFIER = org.64p.VoiceLoggerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ObsiVoice.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ObsiVoice";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VoiceLogger.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/VoiceLogger";
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Release;
@@ -516,14 +516,14 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = org.64p.ObsiVoiceUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = org.64p.VoiceLoggerUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = ObsiVoice;
+				TEST_TARGET_NAME = VoiceLogger;
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Debug;
@@ -537,14 +537,14 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = org.64p.ObsiVoiceUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = org.64p.VoiceLoggerUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = ObsiVoice;
+				TEST_TARGET_NAME = VoiceLogger;
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Release;
@@ -552,7 +552,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		66EFEA722E0ED1F6001676F5 /* Build configuration list for PBXProject "ObsiVoice" */ = {
+		66EFEA722E0ED1F6001676F5 /* Build configuration list for PBXProject "VoiceLogger" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				66EFEA972E0ED1F8001676F5 /* Debug */,
@@ -561,7 +561,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		66EFEA992E0ED1F8001676F5 /* Build configuration list for PBXNativeTarget "ObsiVoice" */ = {
+		66EFEA992E0ED1F8001676F5 /* Build configuration list for PBXNativeTarget "VoiceLogger" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				66EFEA9A2E0ED1F8001676F5 /* Debug */,
@@ -570,7 +570,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		66EFEA9C2E0ED1F8001676F5 /* Build configuration list for PBXNativeTarget "ObsiVoiceTests" */ = {
+		66EFEA9C2E0ED1F8001676F5 /* Build configuration list for PBXNativeTarget "VoiceLoggerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				66EFEA9D2E0ED1F8001676F5 /* Debug */,
@@ -579,7 +579,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		66EFEA9F2E0ED1F8001676F5 /* Build configuration list for PBXNativeTarget "ObsiVoiceUITests" */ = {
+		66EFEA9F2E0ED1F8001676F5 /* Build configuration list for PBXNativeTarget "VoiceLoggerUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				66EFEAA02E0ED1F8001676F5 /* Debug */,

@@ -21,8 +21,8 @@ jobs:
     
     - name: Build
       run: |
-        xcodebuild -project ObsiVoice.xcodeproj \
-          -scheme ObsiVoice \
+        xcodebuild -project VoiceLogger.xcodeproj \
+          -scheme VoiceLogger \
           -configuration Debug \
           -destination 'platform=macOS' \
           clean build \
@@ -34,8 +34,8 @@ jobs:
     
     - name: Run Tests
       run: |
-        xcodebuild test -project ObsiVoice.xcodeproj \
-          -scheme ObsiVoice \
+        xcodebuild test -project VoiceLogger.xcodeproj \
+          -scheme VoiceLogger \
           -destination 'platform=macOS' \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
@@ -52,7 +52,7 @@ jobs:
     - name: Archive build artifacts
       run: |
         cd build/Debug
-        zip -r ../../VoiceLogger.zip ObsiVoice.app
+        zip -r ../../VoiceLogger.zip VoiceLogger.app
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4

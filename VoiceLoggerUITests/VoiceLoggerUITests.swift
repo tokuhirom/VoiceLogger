@@ -1,13 +1,13 @@
 //
-//  ObsiVoiceUITests.swift
-//  ObsiVoiceUITests
+//  VoiceLoggerUITests.swift
+//  VoiceLoggerUITests
 //
 //  Created by 松野 徳大 on 2025/06/27.
 //
 
 import XCTest
 
-final class ObsiVoiceUITests: XCTestCase {
+final class VoiceLoggerUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

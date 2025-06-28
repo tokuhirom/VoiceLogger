@@ -55,7 +55,7 @@ class LaunchAtLoginHelper {
         if let scriptObject = NSAppleScript(source: script) {
             let output = scriptObject.executeAndReturnError(&error)
             if let items = output.stringValue {
-                if items.contains("ObsiVoice") || items.contains("VoiceLogger") {
+                if items.contains("VoiceLogger") || items.contains("VoiceLogger") {
                     return true
                 }
             }

@@ -17,8 +17,8 @@ jobs:
     
     - name: Build Release
       run: |
-        xcodebuild -project ObsiVoice.xcodeproj \
-          -scheme ObsiVoice \
+        xcodebuild -project VoiceLogger.xcodeproj \
+          -scheme VoiceLogger \
           -configuration Release \
           -destination 'platform=macOS' \
           clean build \
@@ -29,7 +29,7 @@ jobs:
       run: |
         # Create a temporary directory for DMG contents
         mkdir -p dmg-contents
-        cp -R build/Release/ObsiVoice.app dmg-contents/VoiceLogger.app
+        cp -R build/Release/VoiceLogger.app dmg-contents/VoiceLogger.app
         
         # Create Applications symlink
         ln -s /Applications dmg-contents/Applications

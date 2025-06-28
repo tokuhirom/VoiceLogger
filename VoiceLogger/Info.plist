@@ -5,10 +5,10 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>ObsiVoice needs access to your microphone to record voice notes.</string>
+	<string>VoiceLogger needs access to your microphone to record voice notes.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>ObsiVoice needs speech recognition to transcribe your voice notes.</string>
+	<string>VoiceLogger needs speech recognition to transcribe your voice notes.</string>
 	<key>NSAppleEventsUsageDescription</key>
-	<string>ObsiVoice needs accessibility access to register global keyboard shortcuts.</string>
+	<string>VoiceLogger needs accessibility access to register global keyboard shortcuts.</string>
 </dict>
 </plist>

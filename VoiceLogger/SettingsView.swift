@@ -15,7 +15,7 @@ struct SettingsView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Title
-            Text("ObsiVoice Settings")
+            Text("VoiceLogger Settings")
                 .font(.largeTitle)
                 .padding()
             
