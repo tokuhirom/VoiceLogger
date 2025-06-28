@@ -1,6 +1,6 @@
 # VoiceLogger 🎙️📝
 
-**VoiceLogger** (formerly VoiceLogger) is a lightweight macOS menu bar app that lets you capture voice notes via a simple keyboard shortcut. It transcribes your speech using macOS native APIs and saves the result to markdown files with customizable paths and formats.
+**VoiceLogger** is a lightweight macOS menu bar app that lets you capture voice notes via a simple keyboard shortcut. It transcribes your speech using macOS native APIs and saves the result to markdown files with customizable paths and formats.
 
 > **Note**: The project is in the process of being renamed from VoiceLogger to VoiceLogger. Some references may still use the old name.
 
