@@ -7,6 +7,7 @@ struct SettingsView: View {
     @State private var dateLocale = FileManager.shared.dateLocale
     @State private var showNotifications = FileManager.shared.showNotifications
     @State private var autoStartRecording = FileManager.shared.autoStartRecording
+    @State private var launchAtLogin = FileManager.shared.launchAtLogin
     @State private var recordingShortcut = ShortcutManager.shared.currentShortcut
     @State private var expandedPath: String = ""
     @State private var dateHeaderPreview: String = ""
@@ -163,6 +164,9 @@ struct SettingsView: View {
                     
                     Toggle("Start recording automatically on launch", isOn: $autoStartRecording)
                         .font(.body)
+                    
+                    Toggle("Launch at login", isOn: $launchAtLogin)
+                        .font(.body)
                 }
                 .padding()
             }
@@ -200,6 +204,7 @@ struct SettingsView: View {
         FileManager.shared.dateLocale = dateLocale
         FileManager.shared.showNotifications = showNotifications
         FileManager.shared.autoStartRecording = autoStartRecording
+        FileManager.shared.launchAtLogin = launchAtLogin
     }
     
     private func updateDateHeaderPreview() {

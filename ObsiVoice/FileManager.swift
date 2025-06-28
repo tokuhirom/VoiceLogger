@@ -10,6 +10,7 @@ class FileManager {
     private let dateLocaleKey = "DateLocale"
     private let showNotificationsKey = "ShowNotifications"
     private let autoStartRecordingKey = "AutoStartRecording"
+    private let launchAtLoginKey = "LaunchAtLogin"
     
     private init() {}
     
@@ -68,6 +69,16 @@ class FileManager {
         }
         set {
             UserDefaults.standard.set(newValue, forKey: autoStartRecordingKey)
+        }
+    }
+    
+    var launchAtLogin: Bool {
+        get {
+            return LaunchAtLoginHelper.shared.isEnabled
+        }
+        set {
+            LaunchAtLoginHelper.shared.isEnabled = newValue
+            UserDefaults.standard.set(newValue, forKey: launchAtLoginKey)
         }
     }
     
