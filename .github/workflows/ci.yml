@@ -72,5 +72,4 @@ jobs:
       run: brew install swiftlint
     
     - name: Run SwiftLint
-      run: swiftlint lint --reporter github-actions-logging
-      continue-on-error: true
+      run: swiftlint lint --strict --reporter github-actions-logging
