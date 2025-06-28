@@ -315,7 +315,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func handleTranscribedText(_ text: String) {
         // Write to file
         FileManager.shared.appendToFile(text: text)
-        showNotification(title: "Voice Note Transcribed", subtitle: text)
+        
+        // Show notification if enabled
+        if FileManager.shared.showNotifications {
+            showNotification(title: "Voice Note Transcribed", subtitle: text)
+        }
     }
     
     private func showAlert(title: String, message: String) {

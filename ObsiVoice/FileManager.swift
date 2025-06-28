@@ -8,6 +8,7 @@ class FileManager {
     private let noteTemplateKey = "NoteTemplate"
     private let dateHeaderFormatKey = "DateHeaderFormat"
     private let dateLocaleKey = "DateLocale"
+    private let showNotificationsKey = "ShowNotifications"
     
     private init() {}
     
@@ -44,6 +45,19 @@ class FileManager {
         }
         set {
             UserDefaults.standard.set(newValue, forKey: dateLocaleKey)
+        }
+    }
+    
+    var showNotifications: Bool {
+        get {
+            // Default to true if not set
+            if UserDefaults.standard.object(forKey: showNotificationsKey) == nil {
+                return true
+            }
+            return UserDefaults.standard.bool(forKey: showNotificationsKey)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: showNotificationsKey)
         }
     }
     

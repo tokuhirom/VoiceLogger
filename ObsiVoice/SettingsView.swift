@@ -5,6 +5,7 @@ struct SettingsView: View {
     @State private var noteTemplate = FileManager.shared.noteTemplate
     @State private var dateHeaderFormat = FileManager.shared.dateHeaderFormat
     @State private var dateLocale = FileManager.shared.dateLocale
+    @State private var showNotifications = FileManager.shared.showNotifications
     @State private var recordingShortcut = ShortcutManager.shared.currentShortcut
     @State private var expandedPath: String = ""
     @State private var dateHeaderPreview: String = ""
@@ -151,6 +152,11 @@ struct SettingsView: View {
                             FileManager.shared.openCurrentLogFile()
                         }
                     }
+                    
+                    Divider()
+                    
+                    Toggle("Show notifications after transcription", isOn: $showNotifications)
+                        .font(.body)
                 }
                 .padding()
             }
@@ -183,6 +189,7 @@ struct SettingsView: View {
         FileManager.shared.noteTemplate = noteTemplate
         FileManager.shared.dateHeaderFormat = dateHeaderFormat
         FileManager.shared.dateLocale = dateLocale
+        FileManager.shared.showNotifications = showNotifications
     }
     
     private func updateDateHeaderPreview() {
