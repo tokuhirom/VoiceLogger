@@ -172,7 +172,7 @@ class FileManager {
                 try initialContent.write(to: url, atomically: true, encoding: .utf8)
             } else {
                 // Append to existing file
-                let dataToAppend = "\n\(formattedText)".data(using: .utf8)!
+                let dataToAppend = Data("\n\(formattedText)".utf8)
                 let fileHandle = try FileHandle(forWritingTo: url)
                 fileHandle.seekToEndOfFile()
                 fileHandle.write(dataToAppend)

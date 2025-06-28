@@ -97,8 +97,8 @@ class AudioRecorder: NSObject, ObservableObject {
                 // Manually calculate channels from the buffer list
                 withUnsafePointer(to: &bufferList.pointee.mBuffers) { buffersPtr in
                     let buffers = UnsafeBufferPointer(start: buffersPtr, count: bufferCount)
-                    for i in 0..<bufferCount {
-                        totalChannels += buffers[i].mNumberChannels
+                    for idx in 0..<bufferCount {
+                        totalChannels += buffers[idx].mNumberChannels
                     }
                 }
             }
@@ -170,6 +170,21 @@ class AudioRecorder: NSObject, ObservableObject {
         guard !isRecording else { return nil }
         
         // Check microphone permission first
+        guard checkMicrophonePermission() else { return nil }
+        
+        // Setup audio engine
+        guard setupAudioEngine() else { return nil }
+        
+        // Setup recognition request
+        guard let request = setupRecognitionRequest() else {
+            stopRecording()
+            return nil
+        }
+        
+        return request
+    }
+    
+    private func checkMicrophonePermission() -> Bool {
         switch AVCaptureDevice.authorizationStatus(for: .audio) {
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .audio) { granted in
@@ -179,18 +194,20 @@ class AudioRecorder: NSObject, ObservableObject {
                     }
                 }
             }
-            return nil
+            return false
         case .denied, .restricted:
             print("Microphone access denied")
-            return nil
+            return false
         case .authorized:
-            break
+            return true
         @unknown default:
-            return nil
+            return false
         }
-        
+    }
+    
+    private func setupAudioEngine() -> Bool {
         audioEngine = AVAudioEngine()
-        guard let audioEngine = audioEngine else { return nil }
+        guard let audioEngine = audioEngine else { return false }
         
         // Set the selected audio device if available
         if let deviceID = selectedDeviceID {
@@ -205,50 +222,55 @@ class AudioRecorder: NSObject, ObservableObject {
         }
         
         inputNode = audioEngine.inputNode
+        return true
+    }
+    
+    private func setupRecognitionRequest() -> SFSpeechAudioBufferRecognitionRequest? {
+        guard let inputNode = inputNode else { return nil }
         
         // Use the input node's format to avoid format mismatch
-        let recordingFormat = inputNode!.outputFormat(forBus: 0)
+        let recordingFormat = inputNode.outputFormat(forBus: 0)
         
         recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
         recognitionRequest?.shouldReportPartialResults = true
         recognitionRequest?.requiresOnDeviceRecognition = true
         
-        inputNode!.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] (buffer, when) in
+        inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] (buffer, _) in
             guard let self = self, let request = self.recognitionRequest else { return }
             request.append(buffer)
-            
-            // Calculate audio level for visual feedback
-            let channelData = buffer.floatChannelData?[0]
-            let channelDataValueCount = Int(buffer.frameLength)
-            if let channelData = channelData {
-                var sum: Float = 0
-                var maxValue: Float = 0
-                for i in 0..<channelDataValueCount {
-                    let value = channelData[i]
-                    sum += value * value
-                    maxValue = max(maxValue, abs(value))
-                }
-                let rms = sqrt(sum / Float(channelDataValueCount))
-                let avgPower = 20 * log10(max(0.00001, rms))
-                let level = max(0.0, min(1.0, (avgPower + 50) / 50))
-                
-                
-                DispatchQueue.main.async {
-                    self.audioLevel = level
-                }
-            }
+            self.processAudioLevel(from: buffer)
         }
         
-        audioEngine.prepare()
+        audioEngine?.prepare()
         
         do {
-            try audioEngine.start()
+            try audioEngine?.start()
             isRecording = true
             return recognitionRequest
         } catch {
             print("Failed to start audio engine: \(error)")
-            stopRecording()
             return nil
+        }
+    }
+    
+    private func processAudioLevel(from buffer: AVAudioPCMBuffer) {
+        let channelData = buffer.floatChannelData?[0]
+        let channelDataValueCount = Int(buffer.frameLength)
+        guard let channelData = channelData else { return }
+        
+        var sum: Float = 0
+        var maxValue: Float = 0
+        for idx in 0..<channelDataValueCount {
+            let value = channelData[idx]
+            sum += value * value
+            maxValue = max(maxValue, abs(value))
+        }
+        let rms = sqrt(sum / Float(channelDataValueCount))
+        let avgPower = 20 * log10(max(0.00001, rms))
+        let level = max(0.0, min(1.0, (avgPower + 50) / 50))
+        
+        DispatchQueue.main.async {
+            self.audioLevel = level
         }
     }
     
