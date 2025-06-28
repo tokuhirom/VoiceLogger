@@ -9,6 +9,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSUserNotifi
     private let speechRecognizer = SpeechRecognizer()
     private var settingsWindow: NSWindow?
     private var stopRecordingTimer: Timer?
+    private var recordMenuItem: NSMenuItem?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Ensure app appears in accessibility list immediately
@@ -108,7 +109,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSUserNotifi
         )
     }
     
-    private func toggleRecording() {
+    @objc private func toggleRecording() {
         if audioRecorder.isRecording {
             print("Toggle: stopping recording")
             stopRecordingAndTranscribe()
@@ -170,15 +171,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSUserNotifi
         let menu = NSMenu()
         menu.delegate = self
         
-        let recordItem = NSMenuItem(title: "Record Voice Note", action: #selector(startRecording), keyEquivalent: "")
-        if let shortcut = ShortcutManager.shared.currentShortcut {
-            recordItem.keyEquivalent = ""
-            if AXIsProcessTrusted() {
-                recordItem.title = "Record Voice Note (\(shortcut.displayString))"
-            } else {
-                recordItem.title = "Record Voice Note (\(shortcut.displayString) - ⚠️ No Permission)"
-            }
-        }
+        let recordItem = NSMenuItem(title: "Record Voice Note", action: #selector(toggleRecording), keyEquivalent: "")
+        recordItem.tag = 200 // Tag to identify the record menu item
+        self.recordMenuItem = recordItem
+        updateRecordMenuItemTitle()
         menu.addItem(recordItem)
         menu.addItem(NSMenuItem.separator())
         
@@ -321,6 +317,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSUserNotifi
             let imageName = isRecording ? "mic.circle.fill" : "mic.fill"
             button.image = NSImage(systemSymbolName: imageName, accessibilityDescription: "VoiceLogger")
         }
+        updateRecordMenuItemTitle()
     }
     
     private func updateStatusItemForProcessing() {
@@ -408,9 +405,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSUserNotifi
         return "Version \(version) (\(build))"
     }
     
+    private func updateRecordMenuItemTitle() {
+        guard let recordItem = recordMenuItem else { return }
+        
+        let isRecording = audioRecorder.isRecording
+        let baseTitle = isRecording ? "Stop Recording" : "Record Voice Note"
+        
+        if let shortcut = ShortcutManager.shared.currentShortcut {
+            if AXIsProcessTrusted() {
+                recordItem.title = "\(baseTitle) (\(shortcut.displayString))"
+            } else {
+                recordItem.title = "\(baseTitle) (\(shortcut.displayString) - ⚠️ No Permission)"
+            }
+        } else {
+            recordItem.title = baseTitle
+        }
+    }
+    
     // MARK: - NSMenuDelegate
     
     func menuWillOpen(_ menu: NSMenu) {
+        // Update record menu item title
+        updateRecordMenuItemTitle()
+        
         // Update microphone submenu when main menu opens
         if let microphoneItem = menu.item(withTag: 100),
            let microphoneSubmenu = microphoneItem.submenu {
