@@ -10,6 +10,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSUserNotifi
     private var settingsWindow: NSWindow?
     private var stopRecordingTimer: Timer?
     private var recordMenuItem: NSMenuItem?
+    private var wasRecordingBeforeSleep = false
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Ensure app appears in accessibility list immediately
@@ -17,6 +18,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSUserNotifi
         
         // Set up notification center delegate
         NSUserNotificationCenter.default.delegate = self
+        
+        // Set up sleep/wake notifications
+        setupSleepWakeNotifications()
         
         setupMenuBar()
         setupShortcuts()
@@ -63,6 +67,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSUserNotifi
     
     func applicationWillTerminate(_ notification: Notification) {
         ShortcutManager.shared.unregister()
+        
+        // Remove sleep/wake observers
+        NSWorkspace.shared.notificationCenter.removeObserver(self)
     }
     
     private func setupMenuBar() {
@@ -445,5 +452,72 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSUserNotifi
     func userNotificationCenter(_ center: NSUserNotificationCenter, shouldPresent notification: NSUserNotification) -> Bool {
         // Always show notifications even when app is in foreground
         return true
+    }
+    
+    // MARK: - Sleep/Wake Handling
+    
+    private func setupSleepWakeNotifications() {
+        let notificationCenter = NSWorkspace.shared.notificationCenter
+        
+        // Listen for sleep notification
+        notificationCenter.addObserver(
+            self,
+            selector: #selector(handleSleepNotification(_:)),
+            name: NSWorkspace.willSleepNotification,
+            object: nil
+        )
+        
+        // Listen for wake notification
+        notificationCenter.addObserver(
+            self,
+            selector: #selector(handleWakeNotification(_:)),
+            name: NSWorkspace.didWakeNotification,
+            object: nil
+        )
+    }
+    
+    @objc private func handleSleepNotification(_ notification: Notification) {
+        print("System going to sleep...")
+        
+        // If recording, stop it and remember the state
+        if audioRecorder.isRecording {
+            wasRecordingBeforeSleep = true
+            print("Stopping recording due to sleep...")
+            
+            // Cancel any pending timers
+            stopRecordingTimer?.invalidate()
+            stopRecordingTimer = nil
+            
+            // Stop recording without showing alerts
+            audioRecorder.stopRecording()
+            speechRecognizer.stopTranscription()
+            updateStatusItemForRecording(false)
+        } else {
+            wasRecordingBeforeSleep = false
+        }
+    }
+    
+    @objc private func handleWakeNotification(_ notification: Notification) {
+        print("System waking up...")
+        
+        // Give the system a moment to stabilize
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            
+            // Update audio devices list as they may have changed
+            self.audioRecorder.updateAvailableDevices()
+            
+            // If we were recording before sleep, show a notification
+            if self.wasRecordingBeforeSleep {
+                self.wasRecordingBeforeSleep = false
+                
+                if FileManager.shared.showNotifications {
+                    self.showNotification(
+                        title: "Recording Stopped",
+                        subtitle: "Recording was stopped when the system went to sleep"
+                    )
+                }
+            }
+        }
     }
 }
