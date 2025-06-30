@@ -11,6 +11,7 @@ class FileManager {
     private let showNotificationsKey = "ShowNotifications"
     private let autoStartRecordingKey = "AutoStartRecording"
     private let launchAtLoginKey = "LaunchAtLogin"
+    private let speechRecognitionLocaleKey = "SpeechRecognitionLocale"
     
     private init() {}
     
@@ -79,6 +80,16 @@ class FileManager {
         set {
             LaunchAtLoginHelper.shared.isEnabled = newValue
             UserDefaults.standard.set(newValue, forKey: launchAtLoginKey)
+        }
+    }
+    
+    var speechRecognitionLocale: String {
+        get {
+            // Default to system locale
+            UserDefaults.standard.string(forKey: speechRecognitionLocaleKey) ?? Locale.current.identifier
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: speechRecognitionLocaleKey)
         }
     }
     

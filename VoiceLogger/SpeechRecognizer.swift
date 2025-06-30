@@ -2,7 +2,7 @@ import Speech
 import Combine
 
 class SpeechRecognizer: NSObject, ObservableObject {
-    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "ja-JP"))!
+    private var speechRecognizer: SFSpeechRecognizer!
     private var recognitionTask: SFSpeechRecognitionTask?
     
     @Published var transcribedText = ""
@@ -16,6 +16,7 @@ class SpeechRecognizer: NSObject, ObservableObject {
     
     override init() {
         super.init()
+        setupSpeechRecognizer()
         requestAuthorization()
     }
     
@@ -119,6 +120,30 @@ class SpeechRecognizer: NSObject, ObservableObject {
         
         recognitionTask?.finish()
         recognitionTask = nil
+    }
+    
+    private func setupSpeechRecognizer() {
+        let localeIdentifier = FileManager.shared.speechRecognitionLocale
+        let locale = Locale(identifier: localeIdentifier)
+        
+        // Check if the locale is supported
+        if let recognizer = SFSpeechRecognizer(locale: locale) {
+            speechRecognizer = recognizer
+        } else {
+            // Fallback to system locale
+            print("Locale \(localeIdentifier) not supported for speech recognition, falling back to system locale")
+            speechRecognizer = SFSpeechRecognizer()
+        }
+    }
+    
+    func updateLocale() {
+        // Stop any ongoing transcription
+        if recognitionTask != nil {
+            stopTranscription()
+        }
+        
+        // Setup with new locale
+        setupSpeechRecognizer()
     }
     
     private func resetSilenceTimer() {
