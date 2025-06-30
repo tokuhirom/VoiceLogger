@@ -11,6 +11,7 @@ struct SettingsView: View {
     @State private var recordingShortcut = ShortcutManager.shared.currentShortcut
     @State private var expandedPath: String = ""
     @State private var dateHeaderPreview: String = ""
+    @State private var speechRecognitionLocale = FileManager.shared.speechRecognitionLocale
     
     var body: some View {
         VStack(spacing: 0) {
@@ -159,6 +160,32 @@ struct SettingsView: View {
                     
                     Divider()
                     
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("Speech Recognition Language")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Picker("", selection: $speechRecognitionLocale) {
+                            Text("System Default").tag(Locale.current.identifier)
+                            Divider()
+                            Text("English (US)").tag("en-US")
+                            Text("English (UK)").tag("en-GB")
+                            Text("Japanese").tag("ja-JP")
+                            Text("Spanish").tag("es-ES")
+                            Text("French").tag("fr-FR")
+                            Text("German").tag("de-DE")
+                            Text("Chinese (Simplified)").tag("zh-CN")
+                            Text("Chinese (Traditional)").tag("zh-TW")
+                            Text("Korean").tag("ko-KR")
+                            Text("Italian").tag("it-IT")
+                            Text("Portuguese (Brazil)").tag("pt-BR")
+                            Text("Russian").tag("ru-RU")
+                        }
+                        .pickerStyle(PopUpButtonPickerStyle())
+                        .frame(width: 200)
+                    }
+                    
+                    Divider()
+                    
                     Toggle("Show notifications after transcription", isOn: $showNotifications)
                         .font(.body)
                     
@@ -205,6 +232,7 @@ struct SettingsView: View {
         FileManager.shared.showNotifications = showNotifications
         FileManager.shared.autoStartRecording = autoStartRecording
         FileManager.shared.launchAtLogin = launchAtLogin
+        FileManager.shared.speechRecognitionLocale = speechRecognitionLocale
     }
     
     private func updateDateHeaderPreview() {
